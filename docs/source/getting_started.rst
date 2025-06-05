@@ -35,18 +35,10 @@ For development or to get the latest features:
 PyTorch Installation
 ~~~~~~~~~~~~~~~~~~~~
 
-VCS Metrics requires PyTorch but doesn't install it automatically to avoid conflicts. Install PyTorch separately:
-
-.. code-block:: bash
-
-   # For CPU-only (most common)
-   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-
-   # For CUDA (if you have compatible GPU)
-   pip install torch torchvision torchaudio
+VCS Metrics requires PyTorch >= 1.9.0 but doesn't install it automatically to avoid conflicts with existing installations. 
 
 .. note::
-   In Google Colab, PyTorch is pre-installed, so no additional installation is needed.
+   **PyTorch Requirements**: VCS Metrics requires PyTorch version 1.9.0 or higher. Please visit the `official PyTorch website <https://pytorch.org/get-started/locally/>`_ to download the appropriate version for your system configuration (CPU/GPU, operating system, etc.). In Google Colab, PyTorch is pre-installed, so no additional installation is needed.
 
 Requirements
 ------------
@@ -86,38 +78,65 @@ The segmenter function takes a string and returns a list of strings (segments).
        """
        pass
 
-**Examples:**
+**Available Libraries and Tools:**
+
+You can use various libraries and models to build your segmenter function:
+
+* **Traditional Libraries**: NLTK, spaCy for sentence and clause segmentation
+* **Modern Models**: `Segment Any Text (SAT) <https://github.com/segment-any-text/wtpsplit>`_ for state-of-the-art text segmentation
+* **Research**: We recommend researching current state-of-the-art segmentation technologies, as poor segmentation can significantly affect VCS performance
+
+**Author Recommendation (2025):**
+
+.. warning::
+   **Technology Evolution**: This recommendation is current as of 2025. As better segmentation models emerge, this recommendation may become outdated. Always research the latest state-of-the-art options.
+
+For 2025, we recommend using **Segment Any Text (SAT)** for optimal segmentation performance:
 
 .. code-block:: python
 
-   # Simple sentence splitting
-   def simple_segmenter(text):
-       return [s.strip() for s in text.split('.') if s.strip()]
-
-   # Using NLTK for sentence tokenization
-   import nltk
-   nltk.download('punkt')
+   import re
+   import string
+   import contractions
+   # Note: You need to download and initialize SAT model first
+   # from wtpsplit import SaT
+   # sat_adapted = SaT("sat-12l-sm")  # or appropriate model variant
    
-   def nltk_segmenter(text):
-       return nltk.sent_tokenize(text)
-
-   # Using spaCy for sentence segmentation
-   import spacy
-   nlp = spacy.load("en_core_web_sm")
+   # Define punctuation set (excluding apostrophes for contractions)
+   punctuations = set(string.punctuation) - {"'"}
    
-   def spacy_segmenter(text):
-       doc = nlp(text)
-       return [sent.text.strip() for sent in doc.sents]
-
-   # Custom segmentation for dialog
-   def dialog_segmenter(text):
-       lines = text.split('\n')
-       return [line.strip() for line in lines if line.strip()]
-
-   # Paragraph-based segmentation
-   def paragraph_segmenter(text):
-       paragraphs = text.split('\n\n')
-       return [p.strip() for p in paragraphs if p.strip()]
+   def sat_segmenter(text: str) -> list[str]:
+       """
+       Advanced text segmenter using Segment Any Text (SAT) model.
+       
+       This function:
+       1. Expands contractions (can't -> cannot)
+       2. Removes punctuation (except apostrophes)
+       3. Fixes spacing around remaining punctuation
+       4. Uses SAT model for intelligent segmentation
+       """
+       # Expand contractions for better processing
+       text = contractions.fix(text)
+       
+       def remove_punctuation(text_str: str) -> str:
+           """Remove punctuation except apostrophes."""
+           return text_str.translate(str.maketrans('', '', ''.join(punctuations)))
+       
+       def fix_punctuation_spacing(text_str: str) -> str:
+           """Add space after sentence-ending punctuation if missing."""
+           return re.sub(r'([.!?])(?=[^\s])', r'\1 ', text_str)
+       
+       # Clean and prepare text
+       text = remove_punctuation(text)
+       text = fix_punctuation_spacing(text)
+       
+       # Use SAT model for segmentation
+       sentences = sat_adapted.split(text)
+       
+       # Clean and filter segments
+       sentences = [s.strip() for s in sentences if s.strip()]
+       
+       return sentences
 
 Embedding Function
 ~~~~~~~~~~~~~~~~~~
@@ -140,106 +159,141 @@ The embedding function takes a list of strings and returns a PyTorch tensor with
        """
        pass
 
-**Examples:**
+**Finding SOTA Embedding Models:**
+
+Visit the `Massive Text Embedding Benchmark (MTEB) <https://huggingface.co/spaces/mteb/leaderboard>`_ to find state-of-the-art embedding models. You can choose from:
+
+* **English Models**: For English-only text analysis
+* **Multilingual Models**: For multi-language support
+* **Different Model Sizes**: From lightweight to high-performance variants
+
+**Author Recommendation (2025):**
+
+.. warning::
+   **Technology Evolution**: This recommendation is current as of 2025. As better embedding models emerge, this recommendation may become outdated. Always check MTEB leaderboard for the latest best-performing models.
+
+For 2025, we recommend **nv-embed-v2** for optimal embedding performance:
 
 .. code-block:: python
 
    import torch
-   from sentence_transformers import SentenceTransformer
-
-   # Using Sentence Transformers (recommended)
-   model = SentenceTransformer('all-MiniLM-L6-v2')
-   
-   def sbert_embeddings(texts):
-       embeddings = model.encode(texts)
-       return torch.tensor(embeddings)
-
-   # Using different models for different purposes
-   def fast_embeddings(texts):
-       model = SentenceTransformer('all-MiniLM-L6-v2')  # Fast, good quality
-       return torch.tensor(model.encode(texts))
-   
-   def high_quality_embeddings(texts):
-       model = SentenceTransformer('all-mpnet-base-v2')  # Slower, higher quality
-       return torch.tensor(model.encode(texts))
-
-   # Using Hugging Face transformers
-   from transformers import AutoTokenizer, AutoModel
    import torch.nn.functional as F
+   # Note: You need to download and initialize nv-embed-v2 model first
+   # model_nv = SentenceTransformer('nvidia/NV-Embed-v2', trust_remote_code=True)
    
-   tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
-   model = AutoModel.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
-   
-   def huggingface_embeddings(texts):
-       encoded_input = tokenizer(texts, padding=True, truncation=True, return_tensors='pt')
-       with torch.no_grad():
-           model_output = model(**encoded_input)
-           # Mean pooling
-           embeddings = F.normalize(model_output.last_hidden_state.mean(dim=1), p=2, dim=1)
-       return embeddings
+   def nv_embed_embedding_fn(texts: list[str], instruction: str = "", model=None,
+                             batch_size: int = 8, max_length: int = 32768) -> torch.Tensor:
+       """
+       High-performance embedding function using nv-embed-v2.
+       
+       Args:
+           texts: List of text segments to embed
+           instruction: Optional instruction for the embedding model
+           model: Pre-initialized nv-embed-v2 model
+           batch_size: Number of texts to process at once
+           max_length: Maximum token length per text
+       """
+       if model is None:
+           model = model_nv  # Use pre-initialized global model
+       
+       device = next(model.parameters()).device
+       all_embs = []
+       
+       # Process in batches to manage memory
+       for i in range(0, len(texts), batch_size):
+           batch = texts[i: i + batch_size]
+           
+           # Generate embeddings
+           emb_np = model.encode(batch, instruction=instruction, max_length=max_length)
+           emb = torch.tensor(emb_np, device=device, dtype=torch.float)
+           
+           # Normalize embeddings for cosine similarity
+           emb = F.normalize(emb, p=2, dim=1)
+           all_embs.append(emb)
+       
+       return torch.cat(all_embs, dim=0)
 
-   # Simple random embeddings (for testing only)
-   def random_embeddings(texts):
-       return torch.randn(len(texts), 384)
+**Important Setup Requirements:**
+
+.. note::
+   **Model Initialization**: Both SAT and nv-embed-v2 require you to download and initialize the models before creating your segmenter or embedding functions. Use SOTA models for best VCS results.
+
+.. warning::
+   **GPU Requirements**: SAT and nv-embed-v2 require GPU access for optimal performance. For CPU-only testing, consider using smaller models from MTEB leaderboard for embeddings and traditional libraries like NLTK or spaCy for segmentation.
 
 Quick Start Example
 -------------------
 
-Here's a complete working example:
+Here's a complete working example using Sentence Transformers:
 
 .. code-block:: python
 
    import torch
-   from sentence_transformers import SentenceTransformer
-   import nltk
-   from vcs import compute_vcs_score
+   import numpy as np
+   import matplotlib.pyplot as plt
 
-   # Download NLTK data (run once)
-   nltk.download('punkt')
-
-   # Set up the model
-   model = SentenceTransformer('all-MiniLM-L6-v2')
-
-   # Define functions
-   def segment_sentences(text):
-       return nltk.sent_tokenize(text)
-
-   def get_embeddings(texts):
-       embeddings = model.encode(texts)
-       return torch.tensor(embeddings)
+   try:
+       from vcs import compute_vcs_score, visualize_metrics_summary
+       print("✅ Main function imported successfully!")
+   except ImportError as e:
+       print(f"❌ Import failed: {e}")
 
    # Example texts
    reference_text = """
-   The quick brown fox jumps over the lazy dog. 
-   It was a beautiful sunny day in the forest. 
+   The quick brown fox jumps over the lazy dog.
+   It was a beautiful sunny day in the forest.
    The fox was looking for food for its family.
    """
 
    generated_text = """
-   A brown fox jumped over a sleeping dog. 
-   The weather was nice and sunny in the woods. 
+   A brown fox jumped over a sleeping dog.
+   The weather was nice and sunny in the woods.
    The fox needed to find food for its cubs.
    """
 
-   # Compute VCS score
-   result = compute_vcs_score(
+   # Load a pre-trained sentence transformer model
+   from sentence_transformers import SentenceTransformer
+   model = SentenceTransformer('all-MiniLM-L6-v2')
+
+   def sbert_embedding_function(texts):
+       """Sentence-BERT embedding function."""
+       embeddings = model.encode(texts)
+       return torch.tensor(embeddings, dtype=torch.float32)
+
+   def simple_segmenter(text):
+       """Simple sentence segmenter."""
+       return [s.strip() for s in text.split('.') if s.strip()]
+
+   # Test with better embeddings
+   print("🧠 Testing with Sentence-BERT embeddings...")
+   result_sbert = compute_vcs_score(
        reference_text=reference_text,
        generated_text=generated_text,
-       segmenter_fn=segment_sentences,
-       embedding_fn_las=get_embeddings,
-       return_all_metrics=True
+       segmenter_fn=simple_segmenter,
+       embedding_fn_las=sbert_embedding_function,
+       embedding_fn_gas=sbert_embedding_function,
+       return_all_metrics=True,
+       return_internals=True
    )
 
-   # Print results
-   print(f"VCS Score: {result['VCS']:.4f}")
-   print(f"GAS Score: {result['GAS']:.4f}")
-   print(f"LAS Score: {result['LAS']:.4f}")
-   print(f"NAS Score: {result['NAS']:.4f}")
+   print("🎯 VCS Results with Sentence-BERT:")
+   print(f"VCS Score: {result_sbert['VCS']:.4f}")
+   print(f"GAS Score: {result_sbert['GAS']:.4f}")
+   print(f"LAS Score: {result_sbert['LAS']:.4f}")
+   print(f"NAS Score: {result_sbert['NAS']:.4f}")
+
+
+   if 'internals' in result_sbert:
+       internals = result_sbert['internals']
+       visualize_metrics_summary(internals)
+
+.. note::
+   **Scale Consideration**: This example uses a small caption to illustrate the concept, but VCS is designed for analyzing really long captions and should be used for them. There is no size limit to caption length - any large generated caption length can be processed.
 
 Configuration Parameters
 ------------------------
 
-VCS Metrics provides several configuration parameters:
+VCS Metrics provides several configuration parameters to control the granularity and strictness of the comparison:
 
 .. code-block:: python
 
@@ -272,13 +326,13 @@ Troubleshooting
 ---------------
 
 **ImportError: No module named 'torch'**
-   Install PyTorch separately: ``pip install torch``
+   Install PyTorch separately from the official website: https://pytorch.org/get-started/locally/
 
-**NLTK data not found**
-   Download required data: ``import nltk; nltk.download('punkt')``
+**SAT or nv-embed-v2 model not found**
+   Download and initialize the models first before creating your functions
 
-**Memory issues with large texts**
-   Try increasing ``chunk_size`` or segmenting texts into smaller pieces
+**GPU memory issues**
+   Try smaller batch sizes or use CPU-compatible models for testing
 
 **Poor VCS scores**
-   Experiment with different segmentation strategies and embedding models
+   Experiment with different segmentation strategies and embedding models from MTEB leaderboard

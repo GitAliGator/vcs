@@ -8,7 +8,11 @@ VCS Metrics Documentation
        <p style="color: #ccfbf1; font-size: 1.2rem; margin: 0.5rem 0 0 0;">Video Comprehension Score - A comprehensive metric for evaluating narrative similarity</p>
    </div>
 
-VCS Metrics is a Python library that provides a comprehensive approach to measuring narrative similarity between reference and generated text. It combines multiple alignment scores to evaluate how well generated content preserves the semantic meaning, local structure, and narrative flow of the original text.
+VCS Metrics is a Python library that provides a comprehensive approach to measuring narrative similarity between reference and generated text. Originally developed to evaluate the video comprehension ability of large video language models by comparing their long video descriptions to human-written captions, VCS can also be used for document-level similarity analysis or comparing similarity between two long stories and other narrative content.
+
+VCS focuses on whether the overall story and narrative structure matches rather than worrying about every small detail. It achieves this by checking the global, local, and chronological semantic alignment between two given long paragraphs. There is no size limit in terms of paragraphs that can be processed.
+
+To understand how VCS works in detail, please read our `research paper <#>`_ or explore our interactive `playground <#>`_.
 
 .. image:: https://img.shields.io/pypi/v/vcs-metrics.svg
    :target: https://pypi.org/project/vcs-metrics/
@@ -25,52 +29,15 @@ VCS Metrics is a Python library that provides a comprehensive approach to measur
 Key Features
 ------------
 
-🎯 **Comprehensive Scoring**: Combines Global Alignment Score (GAS), Local Alignment Score (LAS), and Narrative Alignment Score (NAS)
+🎯 **Comprehensive Scoring**: Evaluates narrative similarity through Global Alignment Score (GAS), Local Alignment Score (LAS), and chronological Narrative Alignment Score (NAS)
 
 📊 **Rich Visualizations**: Generate detailed plots, heatmaps, and PDF reports for analysis
 
-🔧 **Flexible Configuration**: Customizable parameters for different use cases and text types
+🔧 **Flexible Configuration**: VCS is configurable to perform less granular or more granular comparisons and can be configured to control the strictness of comparison, from strict to less strict matching
 
 📈 **Detailed Analytics**: Access to internal calculations for deep analysis and debugging
 
 🎨 **Publication Ready**: Professional visualizations and reports suitable for research and presentations
-
-Quick Example
--------------
-
-.. code-block:: python
-
-   import torch
-   from vcs import compute_vcs_score
-
-   # Simple example with basic functions
-   def simple_segmenter(text):
-       return text.split('.')
-
-   def simple_embedder(texts):
-       # Replace with actual embeddings (e.g., sentence transformers)
-       return torch.randn(len(texts), 384)
-
-   # Compute VCS score
-   result = compute_vcs_score(
-       reference_text="The cat sat on the mat. It was sunny.",
-       generated_text="A cat was on a mat in the sunshine.",
-       segmenter_fn=simple_segmenter,
-       embedding_fn_las=simple_embedder
-   )
-
-   print(f"VCS Score: {result['VCS']:.4f}")
-
-Core Metrics
-------------
-
-**VCS (Video Comprehension Score)**: The overall similarity metric combining all components
-
-**GAS (Global Alignment Score)**: Measures semantic similarity at the full-text level using document embeddings
-
-**LAS (Local Alignment Score)**: Evaluates segment-by-segment semantic similarity with optimal alignment
-
-**NAS (Narrative Alignment Score)**: Assesses narrative flow preservation through distance-based and line-based analysis
 
 Table of Contents
 -----------------
@@ -80,7 +47,6 @@ Table of Contents
    :caption: Contents:
 
    getting_started
-   usage
    api
 
 .. toctree::
