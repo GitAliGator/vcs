@@ -79,8 +79,8 @@ autosummary_generate = True
 
 # Custom CSS
 def setup(app):
-    #app.add_css_file('custom.css')
-    pass
+    app.add_css_file('custom.css')
+    #pass
 
 # HTML theme options
 html_theme_options = {
