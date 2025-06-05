@@ -35,20 +35,6 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
 # Jupyter Notebook
 .ipynb_checkpoints
 
@@ -103,8 +89,6 @@ dmypy.json
 # macOS
 .DS_Store
 
-# Test files
-test_*.png
-test_*.pdf
+# Development artifacts
 *.png
 *.pdf

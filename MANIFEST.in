@@ -6,7 +6,6 @@ include MANIFEST.in
 
 # Include all Python files
 recursive-include src/vcs *.py
-recursive-include tests *.py
 
 # Include documentation
 recursive-include docs *.md *.rst *.txt

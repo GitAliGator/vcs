@@ -1,11 +1,5 @@
-"""
-VCS (Video Comprehension Score) Library
 
-A comprehensive metric for evaluating narrative similarity between reference and generated text.
-Provides Global Alignment Score (GAS), Local Alignment Score (LAS), and Narrative Alignment Score (NAS).
-"""
-
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 __author__ = "Harsh Dubey"
 __email__ = "chulwoo.pack@sdstate.edu"
 

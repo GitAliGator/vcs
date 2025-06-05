@@ -238,17 +238,11 @@ pip install -e ".[dev]"
 pre-commit install
 ```
 
-### Running Tests
-
-```bash
-pytest
-```
-
 ### Code Formatting
 
 ```bash
-black src/ tests/
-isort src/ tests/
+black src/
+isort src/
 ```
 
 ## License
