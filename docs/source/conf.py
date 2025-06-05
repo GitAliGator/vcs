@@ -1,32 +1,14 @@
 # Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import os
 import sys
-from unittest.mock import MagicMock
 
 # -- Path setup --------------------------------------------------------------
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute.
-
 sys.path.insert(0, os.path.abspath('../../src'))
 
-# Mock imports for dependencies that might not be available during doc building
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return MagicMock()
-
-MOCK_MODULES = ['numpy', 'torch', 'matplotlib', 'matplotlib.pyplot', 'seaborn', 
-                'matplotlib.backends', 'matplotlib.backends.backend_pdf']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+# No more mocking needed since we have real dependencies installed!
 
 # -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 project = 'VCS Metrics'
 copyright = '2024, Harsh Dubey, Chulwoo Pack'
 author = 'Harsh Dubey, Chulwoo Pack'
@@ -34,8 +16,6 @@ release = '1.0.2'
 version = '1.0.2'
 
 # -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -43,6 +23,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    # Re-enable now that we have real dependencies
     'sphinx_autodoc_typehints',
 ]
 
@@ -50,8 +31,6 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 # -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
@@ -82,7 +61,7 @@ autodoc_default_options = {
     'exclude-members': '__weakref__'
 }
 
-# Type hints settings
+# Type hints settings - now that we have real dependencies
 typehints_fully_qualified = False
 always_document_param_types = True
 typehints_document_rtype = True
@@ -100,9 +79,10 @@ autosummary_generate = True
 
 # Custom CSS
 def setup(app):
-    app.add_css_file('custom.css')
+    #app.add_css_file('custom.css')
+    pass
 
-# HTML theme options - Updated for teal theme
+# HTML theme options
 html_theme_options = {
     'canonical_url': '',
     'analytics_id': '',
@@ -110,8 +90,7 @@ html_theme_options = {
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
     'vcs_pageview_mode': '',
-    'style_nav_header_background': '#0d9488',  # Updated to teal-600
-    # Toc options
+    'style_nav_header_background': '#0d9488',
     'collapse_navigation': True,
     'sticky_navigation': True,
     'navigation_depth': 4,

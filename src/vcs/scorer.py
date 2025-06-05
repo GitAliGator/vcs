@@ -265,10 +265,6 @@ def compute_vcs_score(
     * **VCS 0.6-0.8**: Good preservation with some differences  
     * **VCS 0.4-0.6**: Moderate preservation, significant changes
     * **VCS < 0.4**: Poor preservation, major structural differences
-    
-    References
-    ----------
-    .. [1] VCS Paper Reference (when available)
     """
     if embedding_fn_las is None and embedding_fn_gas is not None:
         embedding_fn_las = embedding_fn_gas

@@ -1,4 +1,4 @@
-/* Custom CSS for VCS Metrics Documentation - Matching IO Page Theme */
+/* Custom CSS for VCS Metrics Documentation - Fixed for proper alignment */
 
 /* Import Inter font to match IO page */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -133,14 +133,32 @@ table.docutils tr:hover {
     margin: 1em 0;
 }
 
-/* Style for parameter lists */
+/* FIXED: Proper styling for parameter lists - this was the issue! */
 .field-list {
     margin: 1em 0;
+    display: table; /* Use table display for proper alignment */
+    width: 100%;
 }
 
-.field-name {
+.field-list .field {
+    display: table-row;
+    margin: 0.5em 0;
+}
+
+.field-list .field-name {
+    display: table-cell;
     font-weight: bold;
     min-width: 120px;
+    width: 120px; /* Fixed width for labels */
+    padding-right: 1em;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.field-list .field-body {
+    display: table-cell;
+    vertical-align: top;
+    width: auto;
 }
 
 /* Better styling for function documentation */
@@ -187,6 +205,17 @@ a.external:hover {
     
     .wy-nav-content {
         padding: 1em;
+    }
+    
+    /* Make field lists stack on mobile */
+    .field-list .field-name,
+    .field-list .field-body {
+        display: block;
+        width: auto;
+    }
+    
+    .field-list .field-name {
+        margin-bottom: 0.25em;
     }
 }
 

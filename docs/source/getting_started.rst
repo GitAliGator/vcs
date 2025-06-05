@@ -7,7 +7,7 @@ Installation
 ------------
 
 Basic Installation
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Install VCS Metrics from PyPI:
 
@@ -16,7 +16,7 @@ Install VCS Metrics from PyPI:
    pip install vcs-metrics
 
 Development Installation
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For development or to get the latest features:
 
@@ -33,7 +33,7 @@ For development or to get the latest features:
    pre-commit install
 
 PyTorch Installation
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 VCS Metrics requires PyTorch but doesn't install it automatically to avoid conflicts. Install PyTorch separately:
 
@@ -66,7 +66,7 @@ VCS Metrics requires two types of functions that you need to provide:
 2. **Embedding Function**: Converts text segments into numerical vectors
 
 Segmenter Function
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 The segmenter function takes a string and returns a list of strings (segments).
 
@@ -120,7 +120,7 @@ The segmenter function takes a string and returns a list of strings (segments).
        return [p.strip() for p in paragraphs if p.strip()]
 
 Embedding Function
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 The embedding function takes a list of strings and returns a PyTorch tensor with embeddings.
 
@@ -183,7 +183,7 @@ The embedding function takes a list of strings and returns a PyTorch tensor with
        return torch.randn(len(texts), 384)
 
 Quick Start Example
-------------------
+-------------------
 
 Here's a complete working example:
 
