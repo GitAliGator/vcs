@@ -33,10 +33,10 @@ def _compute_actual_line_length(
     else:
         if 0 < ratio_decimal_part <= 0.5:
             lct_window = (2 * mapping_window_height) - 2
+            expanded_lct_window = lct_window + ((mapping_window_height - 1) * lct) if lct > 0 else lct_window
         else:
             lct_window = (2 * mapping_window_height) - 1
-            
-    expanded_lct_window = lct_window * (1 + lct) if lct > 0 else lct_window
+            expanded_lct_window = lct_window + (mapping_window_height * lct) if lct > 0 else lct_window
 
     for i in range(len(dx)):
 
