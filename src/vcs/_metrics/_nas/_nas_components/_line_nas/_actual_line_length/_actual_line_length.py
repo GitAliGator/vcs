@@ -30,6 +30,8 @@ def _compute_actual_line_length(
     
     if y_axis <= x_axis:
         lct_window = mapping_window_height
+        expanded_lct_window = lct_window * (1 + lct) if lct > 0 else lct_window
+
     else:
         if 0 < ratio_decimal_part <= 0.5:
             lct_window = (2 * mapping_window_height) - 2
