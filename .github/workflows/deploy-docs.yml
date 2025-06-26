@@ -50,40 +50,18 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
-      - name: Prepare combined website
+      - name: Prepare website files
         run: |
-          # Create a staging directory for the combined site
-          mkdir -p _site
-          
-          # Copy the main website files (playground, example, etc.)
-          cp docs/index.html _site/
-          cp docs/playground.html _site/
-          cp docs/example.html _site/
-          cp docs/api.html _site/
-          cp docs/script.js _site/
-          cp docs/style.css _site/
-          
-          # Copy any other assets (videos, widgets, etc.)
-          if [ -d "docs/videos" ]; then
-            cp -r docs/videos _site/
-          fi
-          if [ -d "docs/widgets" ]; then
-            cp -r docs/widgets _site/
-          fi
-          
-          # Copy the built Sphinx documentation to build/html subdirectory
-          mkdir -p _site/build
-          cp -r docs/build/html _site/build/
-          
-          # List the structure for debugging
-          echo "Final site structure:"
-          find _site -type f -name "*.html" | head -20
+          # Ensure the docs directory structure is correct
+          ls -la docs/
+          echo "Contents of docs/build/html/:"
+          ls -la docs/build/html/ || echo "build/html directory not found"
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload the combined site
-          path: './_site'
+          # Upload the docs directory which contains the main website
+          path: './docs'
           
       - name: Deploy to GitHub Pages
         id: deployment
