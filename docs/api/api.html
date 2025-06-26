@@ -11,7 +11,7 @@
                     <div class="relative">
                         <iframe 
                             id="sphinxFrame" 
-                            src="/docs/sphinx/build/html/index.html" 
+                            src="./sphinx/build/html/index.html" 
                             class="w-full border-0"
                             style="height: 85vh; min-height: 700px;"
                             onload="handleIframeLoad()"
@@ -43,7 +43,7 @@
                                         Retry Loading
                                     </button>
                                     <br>
-                                    <a href="/docs/sphinx/build/html/index.html" target="_blank" class="text-teal-600 hover:text-teal-800 text-sm">
+                                    <a href="./sphinx/build/html/index.html" target="_blank" class="text-teal-600 hover:text-teal-800 text-sm">
                                         Open documentation in new tab
                                     </a>
                                 </div>
@@ -199,7 +199,7 @@ function retryLoadDocs() {
     errorDiv.classList.add('hidden');
     
     // Reload iframe
-    iframe.src = '/docs/sphinx/build/html/index.html';
+    iframe.src = './sphinx/build/html/index.html';
 }
 
 /**
