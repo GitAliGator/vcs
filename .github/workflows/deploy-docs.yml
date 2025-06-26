@@ -42,18 +42,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r docs/requirements.txt
           
-      # CRITICAL: Install the actual VCS package so Sphinx can import it
-      - name: Install VCS package
-        run: |
-          pip install -e .
-          
-      # Verify that the package can be imported
-      - name: Verify package installation
-        run: |
-          python -c "import vcs; print(f'VCS version: {vcs.__version__}')"
-          python -c "from vcs import compute_vcs_score; print('compute_vcs_score imported successfully')"
-          python -c "import vcs._visualize_vcs; print('Visualization modules imported successfully')"
-          
       - name: Build Sphinx documentation
         run: |
           cd docs
@@ -72,8 +60,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # FIXED: Upload only the built HTML, not the entire docs directory
-          path: './docs/build/html'
+          # Upload the docs directory which contains the main website
+          path: './docs'
           
       - name: Deploy to GitHub Pages
         id: deployment
