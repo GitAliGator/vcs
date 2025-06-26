@@ -42,6 +42,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r docs/requirements.txt
           
+      # CRUCIAL: Install your package so autodoc can import it
+      - name: Install VCS package
+        run: |
+          pip install -e .
+          
       - name: Build Sphinx documentation
         run: |
           cd docs
@@ -60,8 +65,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload the docs directory which contains the main website
-          path: './docs'
+          # FIXED: Upload the built HTML files, not the entire docs directory
+          path: './docs/build/html'
           
       - name: Deploy to GitHub Pages
         id: deployment
