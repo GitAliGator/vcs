@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gradient-to-br from-slate-50 to-teal-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS & VCS Interactive Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .demo-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-badge {
+            background: linear-gradient(135deg, #ccfbf1 0%, #a7f3d0 100%);
+            color: #047857;
+        }
+
+        .pattern-bg {
+            background-image: radial-gradient(circle at 2px 2px, rgba(13, 148, 136, 0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            border: 1px solid #99f6e4;
+        }
+
+        .formula-card {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            border: 1px solid #99f6e4;
+        }
+
+        .metrics-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
+            border: 1px solid #93c5fd;
+        }
+
+        .heatmap-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .heatmap-grid-actual {
+            display: grid;
+            border: 1px solid #d1d5db;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .heatmap-y-axis-value-labels, .heatmap-x-axis-value-labels {
+            position: absolute; 
+        }
+        
+        .heatmap-y-axis-value-labels {
+            left: -30px; 
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+        .heatmap-x-axis-value-labels {
+            bottom: -25px; 
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .heatmap-axis-value-label-item { 
+            font-size: 0.7rem; 
+            color: #64748b;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .heatmap-cell {
+            width: 100%; 
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.6rem; 
+            border-right: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+            box-sizing: border-box;
+            color: #374151;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        .heatmap-cell:nth-child(11n) { border-right: none; }
+        .heatmap-grid-actual > .heatmap-cell:nth-last-child(-n+11) { border-bottom: none; }
+
+        .heatmap-cell.highlighted {
+            border: 3px solid #0d9488;
+            box-shadow: 0 0 0 2px #0d9488 inset, 0 4px 8px rgba(13, 148, 136, 0.3);
+            font-weight: bold;
+            z-index: 10;
+            position: relative; 
+            transform: scale(1.05);
+        }
+
+        .preset-btn {
+            transition: all 0.2s ease;
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+        }
+
+        .preset-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-item span:first-child {
+            color: #475569;
+            font-weight: 500;
+        }
+        .result-item span:last-child {
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .result-item.sas-result span:last-child {
+            color: #0d9488;
+            background-color: rgba(13, 148, 136, 0.1);
+        }
+        .result-item.vcs-result span:last-child {
+            color: #8b5cf6;
+            background-color: rgba(139, 92, 246, 0.1);
+        }
+
+        .axis-title {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .y-axis-title {
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+        }
+
+        .x-axis-title {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body class="h-full text-slate-700 antialiased pattern-bg">
+
+    <main class="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 min-h-screen">
+        
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center mb-4">
+                <div class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide mr-2">
+                    Semantic Assessment
+                </div>
+                <div class="info-badge px-3 py-1 rounded-full text-xs font-semibold">
+                    Multi-Modal Alignment
+                </div>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-teal-600 to-teal-800 bg-clip-text text-transparent">
+                SAS & VCS Interactive Demo
+            </h1>
+            <p class="mt-3 text-lg text-slate-600 max-w-4xl mx-auto">
+                Explore how Global and Local Alignment combine to form Semantic Alignment, and how semantic and narrative scores create Visual Coherence.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="concept-card rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-layer-group text-teal-600 text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-teal-800">Two-Stage Semantic Assessment Process</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white bg-opacity-60 p-4 rounded-lg">
+                            <h4 class="font-semibold text-teal-700 mb-2 flex items-center">
+                                <div class="w-8 h-8 bg-teal-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-2">1</div>
+                                GAS → LAS → SAS
+                            </h4>
+                            <p class="text-sm text-slate-700 mb-3">
+                                <strong>Local Alignment Score (LAS)</strong> acts as a regularizer for <strong>Global Alignment Score (GAS)</strong>. 
+                                When GAS is confident, LAS regularization has minimal effect. This produces the <strong>Semantic Alignment Score (SAS)</strong>.
+                            </p>
+                            <div class="bg-teal-50 p-3 rounded text-xs text-teal-700">
+                                <strong>Key Insight:</strong> Strong global confidence reduces the impact of local variations.
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white bg-opacity-60 p-4 rounded-lg">
+                            <h4 class="font-semibold text-teal-700 mb-2 flex items-center">
+                                <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-2">2</div>
+                                SAS + NAS → VCS
+                            </h4>
+                            <p class="text-sm text-slate-700 mb-3">
+                                <strong>Visual Coherence Score (VCS)</strong> compares SAS and NAS, where the smaller score gets regularized. 
+                                This ensures both semantic understanding and narrative order are captured.
+                            </p>
+                            <div class="bg-purple-50 p-3 rounded text-xs text-purple-700">
+                                <strong>Key Insight:</strong> Both semantics and narrative order must be strong for coherent storytelling.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white bg-opacity-80 p-4 rounded-lg">
+                        <h4 class="font-semibold text-slate-800 mb-2">Story Coherence Logic</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
+                            <div><p><strong>Scenario 1:</strong> High NAS, Low SAS</p><p class="text-xs text-slate-600">Wrong content in right order → No semantic understanding → No story</p></div>
+                            <div><p><strong>Scenario 2:</strong> High SAS, Low NAS</p><p class="text-xs text-slate-600">Right content in wrong order → No narrative coherence → No story</p></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="demo-card rounded-xl p-4">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-semibold mb-2"><i class="fas fa-th mr-1"></i>SAS HEATMAP</div>
+                            <h2 class="text-lg font-bold text-slate-800">Local Regularization of Global</h2>
+                        </div>
+                        <div class="relative w-full max-w-sm mx-auto">
+                            <div class="y-axis-title axis-title">LAS</div>
+                            <div class="heatmap-container rounded-lg p-4">
+                                <div id="sasHeatmapYAxisValueLabels" class="heatmap-y-axis-value-labels"></div>
+                                <div id="sasHeatmapGridActual" class="heatmap-grid-actual aspect-square"></div>
+                                <div id="sasHeatmapXAxisValueLabels" class="heatmap-x-axis-value-labels"></div>
+                            </div>
+                            <div class="x-axis-title axis-title">GAS</div>
+                        </div>
+                    </div>
+
+                    <div class="demo-card rounded-xl p-4">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-semibold mb-2"><i class="fas fa-th mr-1"></i>VCS HEATMAP</div>
+                            <h2 class="text-lg font-bold text-slate-800">Semantic + Narrative Coherence</h2>
+                        </div>
+                        <div class="relative w-full max-w-sm mx-auto">
+                            <div class="y-axis-title axis-title">SAS</div>
+                            <div class="heatmap-container rounded-lg p-4">
+                                <div id="vcsHeatmapYAxisValueLabels" class="heatmap-y-axis-value-labels"></div>
+                                <div id="vcsHeatmapGridActual" class="heatmap-grid-actual aspect-square"></div>
+                                <div id="vcsHeatmapXAxisValueLabels" class="heatmap-x-axis-value-labels"></div>
+                            </div>
+                            <div class="x-axis-title axis-title">NAS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-1">
+                <div class="sticky top-6 space-y-6">
+                    <div class="demo-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center"><i class="fas fa-sliders-h text-teal-600 mr-2"></i>Input Scores</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <label for="gasInput" class="text-sm font-medium text-slate-700">Global Alignment (GAS):</label>
+                                <input type="number" id="gasInput" value="0.8" step="0.1" min="0" max="1" class="w-20 px-2 py-1 border border-slate-300 rounded text-center text-sm">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <label for="lasInput" class="text-sm font-medium text-slate-700">Local Alignment (LAS):</label>
+                                <input type="number" id="lasInput" value="0.7" step="0.1" min="0" max="1" class="w-20 px-2 py-1 border border-slate-300 rounded text-center text-sm">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <label for="nasInput" class="text-sm font-medium text-slate-700">Narrative Alignment (NAS):</label>
+                                <input type="number" id="nasInput" value="0.9" step="0.1" min="0" max="1" class="w-20 px-2 py-1 border border-slate-300 rounded text-center text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="demo-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center"><i class="fas fa-magic text-teal-600 mr-2"></i>Test Scenarios</h3>
+                        <div class="space-y-3">
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" onclick="setScenario(0.9, 0.9, 0.9)"><i class="fas fa-check-circle mr-2"></i>Perfect Alignment</button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" onclick="setScenario(0.8, 0.4, 0.9)"><i class="fas fa-unlink mr-2"></i>Low LAS Impact</button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" onclick="setScenario(0.9, 0.8, 0.3)"><i class="fas fa-random mr-2"></i>High SAS, Low NAS</button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" onclick="setScenario(0.3, 0.8, 0.9)"><i class="fas fa-exclamation-triangle mr-2"></i>Low SAS, High NAS</button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" onclick="setScenario(0.2, 0.2, 0.2)"><i class="fas fa-times-circle mr-2"></i>Poor Alignment</button>
+                        </div>
+                    </div>
+
+                    <div class="metrics-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-4 flex items-center"><i class="fas fa-chart-line text-blue-600 mr-2"></i>Computed Scores</h3>
+                        <div class="space-y-3">
+                            <div class="result-item sas-result"><span>Semantic Alignment (SAS):</span><span id="sasOutput">0.0000</span></div>
+                            <div class="result-item vcs-result"><span>Visual Coherence (VCS):</span><span id="vcsOutput">0.0000</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const gasInput = document.getElementById('gasInput'), lasInput = document.getElementById('lasInput'), nasInput = document.getElementById('nasInput');
+        const sasOutput = document.getElementById('sasOutput'), vcsOutput = document.getElementById('vcsOutput');
+        const sasHeatmapGridActual = document.getElementById('sasHeatmapGridActual'), sasHeatmapXAxisValueLabels = document.getElementById('sasHeatmapXAxisValueLabels'), sasHeatmapYAxisValueLabels = document.getElementById('sasHeatmapYAxisValueLabels');
+        const vcsHeatmapGridActual = document.getElementById('vcsHeatmapGridActual'), vcsHeatmapXAxisValueLabels = document.getElementById('vcsHeatmapXAxisValueLabels'), vcsHeatmapYAxisValueLabels = document.getElementById('vcsHeatmapYAxisValueLabels');
+        const HEATMAP_STEPS = 11;
+
+        function compute_sas(gas, las) { if (las <= 0) return 0; const val_gl = gas + las - 1; return (val_gl > 1e-9) ? (val_gl / las) : 0; }
+        function compute_vcs(sas, nas) { const num_vcs = sas + nas - 1; if (num_vcs <= 1e-9) return 0; const den_vcs = Math.max(sas, nas); if (Math.abs(den_vcs) < 1e-9) return 0; return num_vcs / den_vcs; }
+        function setScenario(gas, las, nas) { gasInput.value = gas.toFixed(1); lasInput.value = las.toFixed(1); nasInput.value = nas.toFixed(1); updateAll(); }
+        function getCellColor(value) {
+            const v = Math.max(0, Math.min(1, value));
+            if (v === 0) return '#f1f5f9';
+            const hue = 160 + (v * 40); // Teal range
+            const saturation = 60 + (v * 20);
+            const lightness = 90 - (v * 40);
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+        function createSingleHeatmap(grid, xLabels, yLabels, dataFunc, yVals, xVals, isVCS) {
+            grid.innerHTML = ''; xLabels.innerHTML = ''; yLabels.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${HEATMAP_STEPS}, 1fr)`;
+            grid.style.gridTemplateRows = `repeat(${HEATMAP_STEPS}, 1fr)`;
+
+            yVals.forEach(yVal => {
+                const yLabel = document.createElement('div'); yLabel.className = 'heatmap-axis-value-label-item'; yLabel.textContent = yVal; yLabels.appendChild(yLabel);
+            });
+            for (let i = 0; i < HEATMAP_STEPS; i++) {
+                for (let j = 0; j < HEATMAP_STEPS; j++) {
+                    const cellVal = dataFunc(parseFloat(xVals[j]), parseFloat(yVals[HEATMAP_STEPS - 1 - i]));
+                    const cell = document.createElement('div'); cell.className = 'heatmap-cell';
+                    cell.textContent = cellVal.toFixed(2); cell.style.backgroundColor = getCellColor(cellVal);
+                    if (isVCS) { cell.dataset.nas = xVals[j]; cell.dataset.sas = yVals[HEATMAP_STEPS - 1 - i]; }
+                    else { cell.dataset.gas = xVals[j]; cell.dataset.las = yVals[HEATMAP_STEPS - 1 - i]; }
+                    grid.appendChild(cell);
+                }
+            }
+            xVals.forEach(xVal => {
+                const xLabel = document.createElement('div'); xLabel.className = 'heatmap-axis-value-label-item'; xLabel.textContent = xVal; xLabels.appendChild(xLabel);
+            });
+        }
+        
+        let highlightedSasCell, highlightedVcsCell;
+        function updateAll() {
+            let gas = parseFloat(gasInput.value), las = parseFloat(lasInput.value), nas = parseFloat(nasInput.value);
+            gas = isNaN(gas) ? 0 : Math.max(0, Math.min(1, gas));
+            las = isNaN(las) ? 0 : Math.max(0, Math.min(1, las));
+            nas = isNaN(nas) ? 0 : Math.max(0, Math.min(1, nas));
+            gasInput.value = gas.toFixed(1); lasInput.value = las.toFixed(1); nasInput.value = nas.toFixed(1);
+            
+            const current_sas = compute_sas(gas, las);
+            const current_vcs = compute_vcs(current_sas, nas);
+            sasOutput.textContent = current_sas.toFixed(4);
+            vcsOutput.textContent = current_vcs.toFixed(4);
+
+            if (highlightedSasCell) highlightedSasCell.classList.remove('highlighted');
+            highlightedSasCell = sasHeatmapGridActual.querySelector(`.heatmap-cell[data-gas="${gas.toFixed(1)}"][data-las="${las.toFixed(1)}"]`);
+            if (highlightedSasCell) highlightedSasCell.classList.add('highlighted');
+
+            if (highlightedVcsCell) highlightedVcsCell.classList.remove('highlighted');
+            const sasForHighlight = parseFloat(current_sas.toFixed(1)).toFixed(1);
+            highlightedVcsCell = vcsHeatmapGridActual.querySelector(`.heatmap-cell[data-sas="${sasForHighlight}"][data-nas="${nas.toFixed(1)}"]`);
+            if (highlightedVcsCell) highlightedVcsCell.classList.add('highlighted');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const axisValues = Array.from({length: HEATMAP_STEPS}, (_, k) => (k * 0.1).toFixed(1));
+            const reversedAxisValues = [...axisValues].reverse();
+            createSingleHeatmap(sasHeatmapGridActual, sasHeatmapXAxisValueLabels, sasHeatmapYAxisValueLabels, (gas, las) => compute_sas(gas, las), reversedAxisValues, axisValues, false);
+            createSingleHeatmap(vcsHeatmapGridActual, vcsHeatmapXAxisValueLabels, vcsHeatmapYAxisValueLabels, (nas, sas) => compute_vcs(sas, nas), reversedAxisValues, axisValues, true);
+            [gasInput, lasInput, nasInput].forEach(input => { input.addEventListener('input', updateAll); input.addEventListener('change', updateAll); });
+            updateAll(); 
+        });
+    </script>
+</body>
+</html>
