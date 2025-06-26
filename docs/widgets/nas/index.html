@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gradient-to-br from-slate-50 to-teal-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Narrative Alignment Score (NAS) - Interactive Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .axis-label {
+            position: absolute; font-size: 0.75rem; color: #475569;
+            font-weight: 500; white-space: nowrap; z-index: 6;
+        }
+        
+        .ideal-mapping-window {
+            position: absolute; border: 2px solid #0d9488;
+            background-color: rgba(20, 184, 166, 0.2);
+            box-sizing: border-box; z-index: 1;
+            transition: all 0.2s ease-out; pointer-events: none;
+            border-radius: 0.25rem;
+        }
+        
+        .lct-padding-window {
+            position: absolute;
+            background-color: rgba(253, 224, 71, 0.15);
+            box-sizing: border-box; z-index: 0; transition: all 0.2s ease-out;
+            pointer-events: none;
+            border: 1px dashed #facc15;
+            border-radius: 0.25rem;
+        }
+        
+        .segment-list ul li {
+            margin-bottom: 4px; line-height: 1.4; font-size: 0.8rem;
+            color: #4b5563; padding: 4px 6px; border-radius: 0.375rem;
+            cursor: pointer; transition: background-color 0.2s;
+            border: 1px solid #e5e7eb; user-select: none;
+        }
+        
+        .segment-list ul li:hover {
+            background-color: #f0fdfa; border-color: #ccfbf1;
+        }
+        
+        .segment-list ul li.inactive-chunk {
+            text-decoration: line-through; color: #9ca3af;
+            background-color: #f3f4f6;
+        }
+        
+        .segment-list ul li.inactive-chunk:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .segment-list ul li.dragging {
+            opacity: 0.5; background-color: #c7d2fe !important; cursor: grabbing;
+        }
+        
+        .drag-placeholder {
+            height: 2.5em; background-color: #eef2ff;
+            border: 2px dashed #a5b4fc; margin-bottom: 4px;
+            border-radius: 0.375rem; display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; color: #64748b;
+        }
+        
+        .gen-marker {
+            position: absolute; width: 12px; height: 12px; border-radius: 50%;
+            background-color: #8b5cf6; border: 2px solid white;
+            cursor: ns-resize; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        
+        .gen-marker.dragging {
+            background-color: #a78bfa; box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        
+        .marker-penalty-label {
+            position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+            font-size: 0.7rem; color: #dc2626; font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.8); padding: 1px 3px;
+            border-radius: 3px; display: none;
+        }
+        
+        .gen-marker:hover .marker-penalty-label { display: block; }
+        
+        .chart-grid-background {
+            background-image:
+                linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+                linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+        }
+
+        /* SVG Path Styles for Line NAS */
+        .ideal-paths-svg, .actual-path-svg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .ideal-paths-svg { z-index: 2; }
+        .actual-path-svg { z-index: 4; }
+        .floor-path-line, .ceil-path-line { 
+            stroke-width: 2px; fill: none; stroke-dasharray: 4; 
+        }
+        .floor-path-line { stroke: #0ea5e9; }
+        .ceil-path-line { stroke: #ec4899; }
+        .actual-path-line { stroke: #8b5cf6; stroke-width: 2.5px; fill: none; }
+
+        .demo-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .preset-btn {
+            transition: all 0.2s ease;
+            background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+        }
+
+        .preset-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .info-badge {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .pattern-bg {
+            background-image: radial-gradient(circle at 2px 2px, rgba(20, 184, 166, 0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            border: 1px solid #99f6e4;
+        }
+
+        .formula-card {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            border: 1px solid #c4b5fd;
+        }
+
+        .metrics-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
+            border: 1px solid #93c5fd;
+        }
+
+        .pipeline-card {
+            background: linear-gradient(135deg, #fef7ff 0%, #fae8ff 100%);
+            border: 1px solid #d8b4fe;
+        }
+
+        .final-score-card {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid #86efac;
+        }
+
+        /* Progress indicators for pipeline */
+        .pipeline-step {
+            position: relative;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .pipeline-step.active {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .pipeline-arrow {
+            position: absolute;
+            right: -0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-700 antialiased pattern-bg">
+
+    <!-- Main Container -->
+    <main class="w-full max-w-8xl mx-auto p-4 sm:p-6 lg:p-8 min-h-screen">
+        
+        <!-- Enhanced Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center mb-4">
+                <div class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide mr-2">
+                    Complete System
+                </div>
+                <div class="info-badge px-3 py-1 rounded-full text-xs font-semibold">
+                    NAS-D + NAS-L + Window Regularizer
+                </div>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-teal-600 to-teal-800 bg-clip-text text-transparent">
+                Complete Narrative Alignment Score (NAS)
+            </h1>
+            <p class="mt-3 text-lg text-slate-600 max-w-4xl mx-auto">
+                A comprehensive evaluation system combining chronological order (NAS-D), narrative flow (NAS-L), and structural coverage (Window Regularizer) into a single robust metric.
+            </p>
+        </div>
+
+        <!-- System Overview -->
+        <div class="pipeline-card rounded-xl p-6 mb-8 max-w-6xl mx-auto">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-sitemap text-purple-600 text-xl mr-3"></i>
+                <h3 class="text-lg font-semibold text-purple-800">Complete NAS Calculation Pipeline</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
+                <div class="pipeline-step bg-white bg-opacity-60 p-4 rounded-lg relative">
+                    <h4 class="font-semibold text-purple-700 mb-2 text-sm">
+                        <i class="fas fa-crosshairs text-purple-500 mr-2"></i>1. NAS-D
+                    </h4>
+                    <p class="text-xs text-slate-700 mb-2">Distance-based chronological alignment</p>
+                    <div class="bg-purple-50 p-2 rounded text-xs">
+                        <strong>Precision:</strong> <span id="pipeline-nasd-precision">0.000</span><br>
+                        <strong>Recall:</strong> <span id="pipeline-nasd-recall">0.000</span>
+                    </div>
+                    <div class="pipeline-arrow"><i class="fas fa-arrow-right text-purple-400"></i></div>
+                </div>
+                
+                <div class="pipeline-step bg-white bg-opacity-60 p-4 rounded-lg relative">
+                    <h4 class="font-semibold text-blue-700 mb-2 text-sm">
+                        <i class="fas fa-route text-blue-500 mr-2"></i>2. NAS-L
+                    </h4>
+                    <p class="text-xs text-slate-700 mb-2">Line-based narrative flow</p>
+                    <div class="bg-blue-50 p-2 rounded text-xs">
+                        <strong>Precision:</strong> <span id="pipeline-nasl-precision">0.000</span><br>
+                        <strong>Recall:</strong> <span id="pipeline-nasl-recall">0.000</span>
+                    </div>
+                    <div class="pipeline-arrow"><i class="fas fa-arrow-right text-blue-400"></i></div>
+                </div>
+                
+                <div class="pipeline-step bg-white bg-opacity-60 p-4 rounded-lg relative">
+                    <h4 class="font-semibold text-amber-700 mb-2 text-sm">
+                        <i class="fas fa-calculator text-amber-500 mr-2"></i>3. F1-NAS
+                    </h4>
+                    <p class="text-xs text-slate-700 mb-2">Harmonic mean of NAS-D & NAS-L</p>
+                    <div class="bg-amber-50 p-2 rounded text-xs">
+                        <strong>Combined:</strong> <span id="pipeline-f1-nas">0.000</span>
+                    </div>
+                    <div class="pipeline-arrow"><i class="fas fa-arrow-right text-amber-400"></i></div>
+                </div>
+                
+                <div class="pipeline-step bg-white bg-opacity-60 p-4 rounded-lg relative">
+                    <h4 class="font-semibold text-red-700 mb-2 text-sm">
+                        <i class="fas fa-window-maximize text-red-500 mr-2"></i>4. Regularizer
+                    </h4>
+                    <p class="text-xs text-slate-700 mb-2">Window coverage penalty</p>
+                    <div class="bg-red-50 p-2 rounded text-xs">
+                        <strong>Penalty:</strong> <span id="pipeline-regularizer">0.000</span>
+                    </div>
+                    <div class="pipeline-arrow"><i class="fas fa-arrow-right text-red-400"></i></div>
+                </div>
+                
+                <div class="pipeline-step bg-white bg-opacity-60 p-4 rounded-lg">
+                    <h4 class="font-semibold text-green-700 mb-2 text-sm">
+                        <i class="fas fa-trophy text-green-500 mr-2"></i>5. Final NAS
+                    </h4>
+                    <p class="text-xs text-slate-700 mb-2">Regularized complete score</p>
+                    <div class="bg-green-50 p-2 rounded text-xs">
+                        <strong>Result:</strong> <span id="pipeline-final-nas" class="font-bold">0.000</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white bg-opacity-80 p-4 rounded-lg text-center">
+                <div class="text-sm text-slate-600 mb-2">Formula:</div>
+                <div class="font-mono text-sm bg-slate-100 p-2 rounded">
+                    Final_NAS = (F1_NAS - Window_Regularizer) / (1 - Window_Regularizer)
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Layout: Reordered to have grids on the left, controls on the right -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            
+            <!-- Visualization Container (Now on the left) -->
+            <div class="xl:col-span-2 space-y-8">
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Precision Chart -->
+                    <div class="demo-card rounded-xl p-4">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-semibold mb-2">
+                                <i class="fas fa-crosshairs mr-1"></i>
+                                PRECISION ANALYSIS
+                            </div>
+                            <h2 class="text-lg font-bold text-slate-800">Gen → Ref Alignment</h2>
+                        </div>
+                        
+                        <div class="relative w-full max-w-md mx-auto pt-4 pb-20 pl-12 pr-4">
+                            <div class="absolute top-1/2 -left-14 -translate-y-12 -rotate-90 font-semibold text-sm text-slate-600 whitespace-nowrap">Reference Chunks</div>
+                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 font-semibold text-sm text-slate-600">Generated Chunks</div>
+                            <div class="relative w-full aspect-square">
+                                <div id="precisionChartGrid" class="absolute inset-0 bg-white rounded-lg chart-grid-background border border-slate-200">
+                                    <div id="precisionLctPaddingContainer"></div>
+                                    <div id="precisionIdealMappingContainer"></div>
+                                    <svg class="ideal-paths-svg" id="precisionIdealPathsSvg"></svg>
+                                    <div id="precisionMarkerContainer"></div>
+                                    <svg class="actual-path-svg" id="precisionActualPathSvg"></svg>
+                                    <div id="precisionAxisLabelContainerY"></div>
+                                    <div id="precisionAxisLabelContainerX"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Recall Chart -->
+                    <div class="demo-card rounded-xl p-4">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold mb-2">
+                                <i class="fas fa-search mr-1"></i>
+                                RECALL ANALYSIS
+                            </div>
+                            <h2 class="text-lg font-bold text-slate-800">Ref → Gen Alignment</h2>
+                        </div>
+                        
+                        <div class="relative w-full max-w-md mx-auto pt-4 pb-20 pl-12 pr-4">
+                            <div class="absolute top-1/2 -left-14 -translate-y-12 -rotate-90 font-semibold text-sm text-slate-600 whitespace-nowrap">Generated Chunks</div>
+                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 font-semibold text-sm text-slate-600">Reference Chunks</div>
+                            <div class="relative w-full aspect-square">
+                                <div id="recallChartGrid" class="absolute inset-0 bg-white rounded-lg chart-grid-background border border-slate-200">
+                                    <div id="recallLctPaddingContainer"></div>
+                                    <div id="recallIdealMappingContainer"></div>
+                                    <svg class="ideal-paths-svg" id="recallIdealPathsSvg"></svg>
+                                    <div id="recallMarkerContainer"></div>
+                                    <svg class="actual-path-svg" id="recallActualPathSvg"></svg>
+                                    <div id="recallAxisLabelContainerY"></div>
+                                    <div id="recallAxisLabelContainerX"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Metrics -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="metrics-card rounded-xl p-4">
+                        <h4 class="font-semibold text-blue-800 mb-3 text-center">
+                            <i class="fas fa-crosshairs text-blue-600 mr-2"></i>NAS-D Metrics
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Precision NAS-D:</span>
+                                <span id="detailed-nasd-precision" class="font-bold text-blue-600">0.000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Recall NAS-D:</span>
+                                <span id="detailed-nasd-recall" class="font-bold text-blue-600">0.000</span>
+                            </div>
+                            <div class="flex justify-between border-t pt-2">
+                                <span>NAS-D F1:</span>
+                                <span id="detailed-nasd-f1" class="font-bold text-blue-600">0.000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-card rounded-xl p-4">
+                        <h4 class="font-semibold text-purple-800 mb-3 text-center">
+                            <i class="fas fa-route text-purple-600 mr-2"></i>NAS-L Metrics
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Precision NAS-L:</span>
+                                <span id="detailed-nasl-precision" class="font-bold text-purple-600">0.000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Recall NAS-L:</span>
+                                <span id="detailed-nasl-recall" class="font-bold text-purple-600">0.000</span>
+                            </div>
+                            <div class="flex justify-between border-t pt-2">
+                                <span>NAS-L F1:</span>
+                                <span id="detailed-nasl-f1" class="font-bold text-purple-600">0.000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-card rounded-xl p-4">
+                        <h4 class="font-semibold text-red-800 mb-3 text-center">
+                            <i class="fas fa-window-maximize text-red-600 mr-2"></i>Window Regularizer
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Timeline Area:</span>
+                                <span id="detailed-reg-timeline" class="font-bold">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Window Area:</span>
+                                <span id="detailed-reg-window" class="font-bold">0</span>
+                            </div>
+                            <div class="flex justify-between border-t pt-2">
+                                <span>Regularizer:</span>
+                                <span id="detailed-reg-value" class="font-bold text-red-600">0.000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Segment Lists -->
+                <div class="demo-card rounded-xl p-6">
+                    <div class="text-center mb-6">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Interactive Narrative Management</h3>
+                        <p class="text-sm text-slate-500">Drag to reorder chunks • Click to activate/deactivate • Drag purple markers to adjust alignments</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="segment-list" id="referenceSegments">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-md font-semibold text-slate-700 flex items-center">
+                                    <i class="fas fa-list text-teal-600 mr-2"></i>
+                                    Reference (<span id="activeRefChunkCount">0</span>/<span id="totalRefChunkCount">0</span>)
+                                </h4>
+                                <button id="resetRefOrderBtn" title="Reset Reference Order" class="text-slate-500 hover:text-blue-600 transition">
+                                    <i class="fas fa-undo text-sm"></i>
+                                </button>
+                            </div>
+                            <ul id="referenceSegmentsUl" class="space-y-1 h-72 overflow-y-auto pr-2 bg-slate-50 rounded p-2"></ul>
+                        </div>
+                        <div class="segment-list" id="generatedSegments">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-md font-semibold text-slate-700 flex items-center">
+                                    <i class="fas fa-list text-amber-600 mr-2"></i>
+                                    Generated (<span id="activeGenChunkCount">0</span>/<span id="totalGenChunkCount">0</span>)
+                                </h4>
+                                <button id="resetGenOrderBtn" title="Reset Generated Order" class="text-slate-500 hover:text-blue-600 transition">
+                                    <i class="fas fa-undo text-sm"></i>
+                                </button>
+                            </div>
+                            <ul id="generatedSegmentsUl" class="space-y-1 h-72 overflow-y-auto pr-2 bg-slate-50 rounded p-2"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="concept-card rounded-lg p-3 text-center">
+                        <div class="w-6 h-6 mx-auto mb-2 border-2 border-teal-600 bg-teal-200 bg-opacity-50 rounded"></div>
+                        <h4 class="font-semibold text-teal-800 mb-1 text-sm">Mapping Windows</h4>
+                        <p class="text-xs text-slate-600">Expected positions</p>
+                    </div>
+                    <div class="concept-card rounded-lg p-3 text-center">
+                        <div class="w-6 h-6 mx-auto mb-2 border border-yellow-400 bg-yellow-200 bg-opacity-50 rounded" style="border-style: dashed;"></div>
+                        <h4 class="font-semibold text-yellow-800 mb-1 text-sm">LCT Tolerance</h4>
+                        <p class="text-xs text-slate-600">Deviation forgiveness</p>
+                    </div>
+                    <div class="concept-card rounded-lg p-3 text-center">
+                        <div class="w-6 h-2 mx-auto mb-2 bg-purple-600 rounded"></div>
+                        <h4 class="font-semibold text-purple-800 mb-1 text-sm">Narrative Paths</h4>
+                        <p class="text-xs text-slate-600">Flow visualization</p>
+                    </div>
+                    <div class="concept-card rounded-lg p-3 text-center">
+                        <div class="w-3 h-3 mx-auto mb-2 bg-purple-600 rounded-full border-2 border-white"></div>
+                        <h4 class="font-semibold text-purple-800 mb-1 text-sm">Draggable Markers</h4>
+                        <p class="text-xs text-slate-600">Adjust alignments</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Exploration Guide -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-hands-helping text-blue-600 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <h4 class="font-semibold text-blue-800 mb-3">Complete NAS Interactive Exploration Guide</h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <h5 class="font-semibold text-blue-700 mb-2">🎯 Quick Test Scenarios</h5>
+                                    <ul class="text-sm text-blue-700 space-y-1">
+                                        <li>• <strong>"Perfect Alignment":</strong> See baseline scores with optimal chronological order</li>
+                                        <li>• <strong>"Minor Disorders":</strong> Small swaps affecting both NAS-D and NAS-L</li>
+                                        <li>• <strong>"Rotate Half":</strong> Splits narrative in middle, tests structural integrity</li>
+                                        <li>• <strong>"Neighbor Swaps":</strong> Adjacent sentence swaps affecting flow smoothness</li>
+                                        <li>• <strong>"Major Misalignment":</strong> Dramatic reordering showing worst-case scenarios</li>
+                                        <li>• <strong>"Reverse Order":</strong> Complete narrative reversal</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="font-semibold text-blue-700 mb-2">🎛️ Interactive Controls</h5>
+                                    <ul class="text-sm text-blue-700 space-y-1">
+                                        <li>• <strong>Drag Purple Markers:</strong> Adjust alignment positions to see real-time NAS-D and NAS-L changes</li>
+                                        <li>• <strong>LCT Slider:</strong> Control tolerance for minor deviations in both distance and flow calculations</li>
+                                        <li>• <strong>Hover Markers:</strong> See individual penalty values for NAS-D distance calculations</li>
+                                        <li>• <strong>Watch Pipeline:</strong> Observe how each component contributes to the final score</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-4">
+                                <h5 class="font-semibold text-blue-800 mb-2">📊 Advanced Chunk Manipulation</h5>
+                                <p class="text-sm text-blue-700 mb-2">
+                                    The visualization is dynamically controlled by active chunks. Use this to explore realistic narrative scenarios:
+                                </p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-700">
+                                    <div>
+                                        <strong>Simulate Deleted Content:</strong>
+                                        <ul class="ml-4 mt-1 space-y-1">
+                                            <li>• Click to deactivate chunks from Generated text</li>
+                                            <li>• Represents missing narrative elements in generation</li>
+                                            <li>• Watch how coverage gaps affect the window regularizer</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <strong>Simulate Added Content:</strong>
+                                        <ul class="ml-4 mt-1 space-y-1">
+                                            <li>• Click to deactivate chunks from Reference text</li>
+                                            <li>• Represents extra narrative elements in generation</li>
+                                            <li>• Observe how precision and recall metrics respond</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-sm text-blue-700">
+                                    <strong>Reorder Narratives:</strong> Drag segments within lists to create custom chronological scenarios and see comprehensive scoring changes across all three components.
+                                </div>
+                            </div>
+
+                            <div class="bg-white bg-opacity-60 p-3 rounded-lg">
+                                <h5 class="font-semibold text-blue-800 mb-2">🔬 What to Observe</h5>
+                                <ul class="text-sm text-blue-700 space-y-1">
+                                    <li>• <strong>NAS-D sensitivity:</strong> How distance penalties increase with chronological displacement</li>
+                                    <li>• <strong>NAS-L behavior:</strong> How path smoothness changes with reordering patterns</li>
+                                    <li>• <strong>Window Regularizer:</strong> How coverage efficiency affects the final regularized score</li>
+                                    <li>• <strong>Component interactions:</strong> How different misalignment types create distinct score profiles</li>
+                                    <li>• <strong>LCT effects:</strong> How tolerance adjustments impact both distance and flow calculations</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps Section -->
+                <div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-arrow-right text-purple-600 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <h4 class="font-semibold text-purple-800 mb-2">What's Next: Video Comprehension Score (VCS)</h4>
+                            <p class="text-sm text-purple-700 mb-3">
+                                While Complete NAS provides comprehensive narrative alignment assessment, it doesn't capture semantic content quality. VCS addresses this by evaluating the actual content coverage and semantic fidelity:
+                            </p>
+                            <ul class="text-sm text-purple-700 space-y-1 mb-4">
+                                <li>• <strong>Content Coverage:</strong> Measures how well generated text covers the semantic space of reference content</li>
+                                <li>• <strong>Semantic Fidelity:</strong> Evaluates the quality and accuracy of semantic information transfer</li>
+                                <li>• <strong>Content Density:</strong> Assesses information density and avoiding semantic dilution</li>
+                                <li>• <strong>Complementary Assessment:</strong> Works alongside NAS to provide complete narrative and content evaluation</li>
+                            </ul>
+                            <div class="bg-purple-100 border border-purple-300 rounded-lg p-3">
+                                <p class="text-sm text-purple-800 font-medium">
+                                    <i class="fas fa-lightbulb mr-2"></i>
+                                    Ready to explore semantic content quality? Check out the <strong>Vectorial Content Scoring (VCS)</strong> interactive demo to complete your narrative evaluation toolkit!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Panel (Now on the right) -->
+            <div class="xl:col-span-1">
+                <div class="sticky top-6 space-y-6">
+                    <!-- LCT Control -->
+                    <div class="formula-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-purple-800 mb-3 flex items-center">
+                            <i class="fas fa-sliders-h text-purple-600 mr-2"></i>
+                            LCT Parameter
+                        </h3>
+                        <div class="flex items-center gap-4 mb-4">
+                            <label for="lctSlider" class="text-sm font-medium text-purple-700">Local Chronology Threshold:</label>
+                            <input type="range" id="lctSlider" min="0" max="5" value="0" step="1" class="flex-1 h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer">
+                            <span id="lctValueDisplay" class="text-lg font-bold text-purple-600 w-8 text-center">0</span>
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded-lg border border-purple-200 text-xs text-purple-700">
+                            <p><strong>Effect:</strong> Higher LCT values provide more tolerance for minor chronological deviations in both NAS-D distance calculations and NAS-L path smoothness.</p>
+                        </div>
+                    </div>
+
+                    <!-- Scenario Presets -->
+                    <div class="demo-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                            <i class="fas fa-magic text-purple-600 mr-2"></i>
+                            Test Scenarios
+                        </h3>
+                        <div class="space-y-3">
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" 
+                                    onclick="resetToOptimalOrder()">
+                                <i class="fas fa-sort-numeric-down mr-2"></i>Perfect Alignment
+                            </button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" 
+                                    onclick="simulateMinorReordering()">
+                                <i class="fas fa-random mr-2"></i>Minor Disorders
+                            </button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" 
+                                    onclick="simulateMajorMisalignment()">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Major Misalignment
+                            </button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" 
+                                    onclick="simulateReverseOrder()">
+                                <i class="fas fa-sort-numeric-up mr-2"></i>Reverse Order
+                            </button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" 
+                                    onclick="simulateRotateHalf()">
+                                <i class="fas fa-sync-alt mr-2"></i>Rotate Half
+                            </button>
+                            <button class="preset-btn w-full text-white px-4 py-2 rounded-lg text-sm font-medium" 
+                                    onclick="simulateNeighborSwaps()">
+                                <i class="fas fa-exchange-alt mr-2"></i>Neighbor Swaps
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Final Score Display -->
+                    <div class="final-score-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
+                            <i class="fas fa-trophy text-green-600 mr-2"></i>
+                            Complete NAS Score
+                        </h3>
+                        <div class="text-center">
+                            <div class="text-6xl font-bold text-green-600 mb-2" id="finalCompleteNas">0.000</div>
+                            <div class="text-sm text-slate-600 mb-4">Comprehensive Narrative Alignment</div>
+                            <div class="bg-green-50 p-3 rounded-lg text-xs text-green-700">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div><strong>NAS-D F1:</strong> <span id="summary-nasd">0.000</span></div>
+                                    <div><strong>NAS-L F1:</strong> <span id="summary-nasl">0.000</span></div>
+                                    <div><strong>Combined F1:</strong> <span id="summary-f1">0.000</span></div>
+                                    <div><strong>Regularizer:</strong> <span id="summary-reg">0.000</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- DATA ---
+        const masterReferenceChunks = [
+            "The old market bell rings starting a busy market", "Vendors open their bright stalls in the busy square while the smell of fresh bread fills the air", "A young seller shouts out good deals as curious people gather around", "The steady ring of the bell sets the pace for the day", "A wise old vendor stops by his stall giving advice to those who pass by", "As the market gets busy the bell rings again at midday reminding everyone of the community spirit", "A light rain briefly slows the crowd but everyone is spirit stays strong", "Local storytellers tell simple tales that catch everyone is attention", "As evening comes the old bell rings one last time perfectly echoing the start of the day"
+        ];
+        const masterGeneratedChunks = [
+            "At first light the town s antique bell clangs signalling that the market is open for business", "Stalls spring to life all around the square their owners lifting colourful awnings while the warm scent of freshbaked bread drifts through the crowd", "A lively young hawker calls out bargains drawing curious shoppers closer", "That bell keeps time for everyone its steady peal guiding the morning rush", "Nearby an older merchant pauses at his booth offering bits of seasoned advice to anyone who will listen", "When noon rolls around the bell sounds again a friendly reminder of the shared spirit that holds the place together", "A brief shower scatters a few people but the mood never really fades", "Storytellers soon reclaim the moment with simple tales that pull listeners back in", "As dusk settles the same bell rings one final note neatly bookending the day it helped begin"
+        ];
+        const masterSimilarityValues = [ 
+            [0.737, 0.360, 0.286, 0.461, 0.284, 0.388, 0.062, 0.139, 0.396], [0.462, 0.783, 0.295, 0.269, 0.264, 0.227, 0.142, 0.158, 0.232], [0.244, 0.238, 0.814, 0.105, 0.337, 0.138, 0.120, 0.169, 0.084], [0.555, 0.259, 0.100, 0.734, 0.137, 0.593, 0.167, 0.199, 0.656], [0.258, 0.254, 0.293, 0.168, 0.774, 0.169, 0.110, 0.165, 0.151], [0.569, 0.340, 0.248, 0.483, 0.241, 0.764, 0.180, 0.216, 0.507], [0.134, 0.219, 0.106, 0.243, 0.133, 0.239, 0.689, 0.183, 0.177], [0.261, 0.259, 0.218, 0.266, 0.274, 0.286, 0.220, 0.679, 0.257], [0.537, 0.277, 0.059, 0.549, 0.218, 0.608, 0.192, 0.212, 0.869]
+        ];
+
+        // --- STATE VARIABLES ---
+        let activeReferenceIndices = [];
+        let activeGeneratedIndices = [];
+        let currentLct = 0;
+        let markerPositions = { precision: [], recall: [] };
+        let actualPathPositions = { precision: [], recall: [] };
+        
+        let draggedItemInfo = { element: null, originalIndex: null, type: null, placeholder: null };
+        let draggedMarkerInfo = { chartType: null, id: null, element: null, chartGrid: null, startY: 0 };
+
+        // --- DOM ELEMENT REFERENCES ---
+        const lctSlider = document.getElementById('lctSlider');
+        const lctValueDisplay = document.getElementById('lctValueDisplay');
+        const referenceSegmentsUl = document.getElementById('referenceSegmentsUl'); 
+        const generatedSegmentsUl = document.getElementById('generatedSegmentsUl');
+        const resetGenOrderBtn = document.getElementById('resetGenOrderBtn');
+        const resetRefOrderBtn = document.getElementById('resetRefOrderBtn');
+        
+        const charts = {
+            precision: {
+                grid: document.getElementById('precisionChartGrid'), idealContainer: document.getElementById('precisionIdealMappingContainer'),
+                lctContainer: document.getElementById('precisionLctPaddingContainer'), markerContainer: document.getElementById('precisionMarkerContainer'),
+                idealPathsSvg: document.getElementById('precisionIdealPathsSvg'), actualPathSvg: document.getElementById('precisionActualPathSvg'),
+                axisX: document.getElementById('precisionAxisLabelContainerX'), axisY: document.getElementById('precisionAxisLabelContainerY'),
+            },
+            recall: {
+                grid: document.getElementById('recallChartGrid'), idealContainer: document.getElementById('recallIdealMappingContainer'),
+                lctContainer: document.getElementById('recallLctPaddingContainer'), markerContainer: document.getElementById('recallMarkerContainer'),
+                idealPathsSvg: document.getElementById('recallIdealPathsSvg'), actualPathSvg: document.getElementById('recallActualPathSvg'),
+                axisX: document.getElementById('recallAxisLabelContainerX'), axisY: document.getElementById('recallAxisLabelContainerY'),
+            }
+        };
+
+        // --- SCENARIO PRESET FUNCTIONS ---
+        function resetToOptimalOrder() {
+            activeReferenceIndices = Array.from({ length: masterReferenceChunks.length }, (_, i) => i);
+            activeGeneratedIndices = Array.from({ length: masterGeneratedChunks.length }, (_, i) => i);
+            initializeAppState(); updateAndRenderAll();
+        }
+
+        function simulateMinorReordering() {
+            activeReferenceIndices = [0, 2, 1, 3, 4, 5, 6, 7, 8];
+            activeGeneratedIndices = [0, 1, 3, 2, 4, 5, 6, 8, 7];
+            initializeAppState(); updateAndRenderAll();
+        }
+
+        function simulateMajorMisalignment() {
+            activeReferenceIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+            activeGeneratedIndices = [2, 5, 1, 7, 0, 4, 8, 3, 6];
+            initializeAppState(); updateAndRenderAll();
+        }
+
+        function simulateReverseOrder() {
+            activeReferenceIndices = Array.from({ length: masterReferenceChunks.length }, (_, i) => i);
+            activeGeneratedIndices = Array.from({ length: masterGeneratedChunks.length }, (_, i) => masterGeneratedChunks.length - 1 - i);
+            initializeAppState(); updateAndRenderAll();
+        }
+
+        function simulateRotateHalf() {
+            activeReferenceIndices = Array.from({ length: masterReferenceChunks.length }, (_, i) => i);
+            // Take second half and put it first, then first half
+            const mid = Math.floor(masterGeneratedChunks.length / 2);
+            const firstHalf = Array.from({ length: mid }, (_, i) => i);
+            const secondHalf = Array.from({ length: masterGeneratedChunks.length - mid }, (_, i) => i + mid);
+            activeGeneratedIndices = [...secondHalf, ...firstHalf];
+            initializeAppState(); updateAndRenderAll();
+        }
+
+        function simulateNeighborSwaps() {
+            activeReferenceIndices = Array.from({ length: masterReferenceChunks.length }, (_, i) => i);
+            activeGeneratedIndices = Array.from({ length: masterGeneratedChunks.length }, (_, i) => i);
+            // Swap neighboring pairs: 0,1 -> 1,0 and 2,3 -> 3,2, etc.
+            for (let i = 0; i < activeGeneratedIndices.length - 1; i += 2) {
+                [activeGeneratedIndices[i], activeGeneratedIndices[i + 1]] = [activeGeneratedIndices[i + 1], activeGeneratedIndices[i]];
+            }
+            initializeAppState(); updateAndRenderAll();
+        }
+
+        // --- CORE LOGIC FUNCTIONS ---
+        function _calculate_f1(precision, recall) {
+            if (precision + recall === 0) return 0.0;
+            return (2 * precision * recall) / (precision + recall);
+        }
+
+        function buildCurrentSimilarityMatrix(isForRecall) {
+            const numRef = activeReferenceIndices.length;
+            const numGen = activeGeneratedIndices.length;
+            if (numRef === 0 || numGen === 0) return [];
+
+            const matrix = Array.from({ length: isForRecall ? numGen : numRef }, () => Array(isForRecall ? numRef : numGen).fill(0));
+
+            for (let i = 0; i < (isForRecall ? numGen : numRef); i++) {
+                for (let j = 0; j < (isForRecall ? numRef : numGen); j++) {
+                    const rIdx = isForRecall ? activeReferenceIndices[j] : activeReferenceIndices[i];
+                    const gIdx = isForRecall ? activeGeneratedIndices[i] : activeGeneratedIndices[j];
+                    matrix[i][j] = masterSimilarityValues[rIdx][gIdx];
+                }
+            }
+
+            // Transpose if not for recall to get columns for processing
+            if (!isForRecall) {
+                 return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+            }
+            // Recall matrix needs to be transposed to be [numRef x numGen]
+            return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+        }
+        
+        function get_mapping_windows_generic(lenX, lenY) {
+            if (lenX === 0 || lenY === 0) return [];
+            const isYLonger = lenY >= lenX;
+            const longerLen = isYLonger ? lenY : lenX;
+            const shorterLen = isYLonger ? lenX : lenY;
+            const slope = longerLen / shorterLen;
+            const mappingWindowSize = Math.ceil(slope);
+            let direct_windows = [];
+            for (let i = 0; i < shorterLen; i++) {
+                const idx_point = i * slope;
+                const start = Math.floor(idx_point);
+                const end = Math.min(start + mappingWindowSize, longerLen);
+                direct_windows.push({ start, end });
+            }
+            if (isYLonger) return direct_windows;
+            let windows_for_X_items = Array(lenX).fill(null);
+            for (let x_idx = 0; x_idx < lenX; x_idx++) {
+                let mappedYIndices = [];
+                direct_windows.forEach((y_window_on_x_axis, y_idx) => {
+                    if (x_idx >= y_window_on_x_axis.start && x_idx < y_window_on_x_axis.end) { mappedYIndices.push(y_idx); }
+                });
+                if (mappedYIndices.length > 0) {
+                    windows_for_X_items[x_idx] = { start: Math.min(...mappedYIndices), end: Math.max(...mappedYIndices) + 1 };
+                } else { 
+                    const proportionalYPos = Math.max(0, Math.min(lenY - 1, Math.floor((x_idx / lenX) * lenY)));
+                    windows_for_X_items[x_idx] = { start: proportionalYPos, end: Math.min(proportionalYPos + 1, lenY) };
+                }
+            }
+            return windows_for_X_items.map(w => w ? ({start: w.start, end: Math.max(w.start + 1, w.end)}) : null);
+        }
+
+        function findBestMatchIndex(similarityColumn) {
+            if (!similarityColumn || similarityColumn.length === 0) return -1;
+            let maxVal = -Infinity, maxIdx = -1;
+            similarityColumn.forEach((val, idx) => { if (val > maxVal) { maxVal = val; maxIdx = idx; } });
+            return maxIdx;
+        }
+
+        function findBestMatchWithContextJS(similarityArray, mappingWindow, cutoff, ctrl) {
+            let maxVal = -Infinity; let maxIdx = -1;
+            if (!similarityArray || similarityArray.length === 0) return { bestMatchIndex: -1 };
+            similarityArray.forEach((val, idx) => { if (val > maxVal) { maxVal = val; maxIdx = idx; } });
+            if (maxIdx === -1) return { bestMatchIndex: -1 };
+
+            const contextRange = 1 - cutoff;
+            const contextWindowApplied = maxVal > 0 && (contextRange - (1 - maxVal)) > 0;
+            const contextValueDrop = (contextWindowApplied && maxVal !== 0) ? ((contextRange - (1 - maxVal)) / maxVal) / ctrl : 0.0;
+            const contextThreshold = maxVal - contextValueDrop;
+            
+            const candidateIndices = []; const candidateValues = [];
+            similarityArray.forEach((val, idx) => { if (val >= contextThreshold) { candidateIndices.push(idx); candidateValues.push(val); } });
+
+            if (candidateIndices.length <= 1 || !mappingWindow) {
+                return { bestMatchIndex: candidateIndices.length === 1 ? candidateIndices[0] : maxIdx };
+            }
+
+            const { start, end } = mappingWindow; 
+            let minDistance = Infinity; let bestMatchIndexToReturn = maxIdx; let highestSimInMinDist = -Infinity;
+
+            candidateIndices.forEach((candIdx, i) => {
+                const dist = candIdx >= start && candIdx < end ? 0 : Math.min(Math.abs(candIdx - start), Math.abs(candIdx - (end - 1)));
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    bestMatchIndexToReturn = candIdx;
+                    highestSimInMinDist = candidateValues[i];
+                } else if (dist === minDistance) {
+                    if (candidateValues[i] > highestSimInMinDist) {
+                        highestSimInMinDist = candidateValues[i];
+                        bestMatchIndexToReturn = candIdx;
+                    }
+                }
+            });
+            return { bestMatchIndex: bestMatchIndexToReturn };
+        }
+
+        // NAS-D Distance calculations
+        function calculatePenaltiesAndNAS(chartType) {
+            const isRecall = chartType === 'recall';
+            const sourceLen = isRecall ? activeGeneratedIndices.length : activeReferenceIndices.length;
+            const targetLen = isRecall ? activeReferenceIndices.length : activeGeneratedIndices.length;
+            const markers = markerPositions[chartType];
+            const idealWindows = get_mapping_windows_generic(sourceLen, targetLen);
+
+            if (sourceLen === 0 || targetLen === 0 || markers.length === 0) return { actualPenalty: 0, maxPenalty: 0, nas: 1.0, markerPenalties: [] };
+
+            let totalActualPenalty = 0;
+            const markerPenalties = [];
+            for (let i = 0; i < sourceLen; i++) {
+                const marker = markers[i]; const window = idealWindows[i];
+                if (!marker || !window) continue;
+                const markerY = marker.currentY; const windowStart = window.start; const windowEnd = window.end - 1; 
+                const lctAdjustedStart = Math.max(0, windowStart - currentLct);
+                const lctAdjustedEnd = Math.min(targetLen - 1, windowEnd + currentLct);
+                let penalty = 0;
+                if (markerY < lctAdjustedStart) { penalty = lctAdjustedStart - markerY; } 
+                else if (markerY > lctAdjustedEnd) { penalty = markerY - lctAdjustedEnd; }
+                totalActualPenalty += penalty;
+                markerPenalties.push({ id: marker.id, penalty: penalty });
+            }
+            const maxPenaltyPerUnit = targetLen > 1 ? targetLen - 1 : 0;
+            const maxTotalPenalty = sourceLen * maxPenaltyPerUnit;
+            const nas = (maxTotalPenalty > 0) ? Math.max(0, 1 - (totalActualPenalty / maxTotalPenalty)) : 1.0;
+            return { actualPenalty: totalActualPenalty, maxPenalty: maxTotalPenalty, nas: nas, markerPenalties: markerPenalties };
+        }
+
+        // NAS-L Line calculations
+        function computeIdealNarrativeLineBandJS(mappingWindows, numX, numY) {
+            const n_windows = mappingWindows.length;
+            if (n_windows === 0 || numX === 0 || numY === 0) {
+                return { shortest_line: 0.0, longest_line: 0.0, floor_path: [], ceil_path: [], floor_path_dy_map: {} };
+            }
+            
+            let dp_min = [], dp_max = [], pred_min = [], pred_max = [];
+            for(let i=0; i<n_windows; ++i) {
+                if(!mappingWindows[i]) {
+                    dp_min.push([]); dp_max.push([]); pred_min.push([]); pred_max.push([]);
+                    continue;
+                }
+                const {start, end} = mappingWindows[i];
+                const h = end - start;
+                dp_min.push(Array(h).fill(Infinity));
+                dp_max.push(Array(h).fill(-Infinity));
+                pred_min.push(Array(h).fill(-1));
+                pred_max.push(Array(h).fill(-1));
+            }
+
+            if(dp_min[0]) {
+                for(let y=0; y<dp_min[0].length; ++y) {
+                    dp_min[0][y] = 0;
+                    dp_max[0][y] = 0;
+                }
+            }
+            
+            for(let i=1; i<n_windows; ++i) {
+                 if(!mappingWindows[i] || !mappingWindows[i-1]) continue;
+                const {start: cur_s, end: cur_e} = mappingWindows[i];
+                const {start: prev_s, end: prev_e} = mappingWindows[i-1];
+                for(let y_cur=0; y_cur<cur_e-cur_s; ++y_cur) {
+                    for(let y_prev=0; y_prev<prev_e-prev_s; ++y_prev) {
+                        const dist = Math.sqrt(1 + (cur_s+y_cur - (prev_s+y_prev))**2);
+                        if(dp_min[i-1][y_prev] !== Infinity && dp_min[i-1][y_prev] + dist < dp_min[i][y_cur]) {
+                            dp_min[i][y_cur] = dp_min[i-1][y_prev] + dist;
+                            pred_min[i][y_cur] = y_prev;
+                        }
+                        if(dp_max[i-1][y_prev] !== -Infinity && dp_max[i-1][y_prev] + dist > dp_max[i][y_cur]) {
+                            dp_max[i][y_cur] = dp_max[i-1][y_prev] + dist;
+                            pred_max[i][y_cur] = y_prev;
+                        }
+                    }
+                }
+            }
+
+            let shortest_line = dp_min[n_windows-1] ? Math.min(...dp_min[n_windows-1]) : 0;
+            let longest_line = dp_max[n_windows-1] ? Math.max(...dp_max[n_windows-1]) : 0;
+            let shortest_end_y = dp_min[n_windows-1] ? dp_min[n_windows-1].indexOf(shortest_line) : -1;
+            let longest_end_y = dp_max[n_windows-1] ? dp_max[n_windows-1].indexOf(longest_line) : -1;
+
+            if(shortest_line === Infinity || shortest_end_y === -1) shortest_line = 0;
+            if(longest_line === -Infinity || longest_end_y === -1) longest_line = 0;
+
+            let floor_path = [], ceil_path = [];
+            let current_y_min = shortest_end_y;
+            let current_y_max = longest_end_y;
+
+            for(let i = n_windows-1; i>=0; --i) {
+                 if(!mappingWindows[i]) continue;
+                if(current_y_min !== -1 && pred_min[i] && pred_min[i][current_y_min] !== undefined) {
+                    floor_path.unshift({x: i, y: mappingWindows[i].start + current_y_min});
+                    current_y_min = pred_min[i][current_y_min];
+                }
+                 if(current_y_max !== -1 && pred_max[i] && pred_max[i][current_y_max] !== undefined) {
+                    ceil_path.unshift({x: i, y: mappingWindows[i].start + current_y_max});
+                    current_y_max = pred_max[i][current_y_max];
+                }
+            }
+            
+            const dyMap = {};
+            if(floor_path.length > 1) {
+                for(let i=0; i<floor_path.length-1; ++i) {
+                    const x_pos = floor_path[i].x;
+                    const dy = floor_path[i+1].y - floor_path[i].y;
+                    dyMap[x_pos] = dy;
+                }
+            }
+            
+            return { shortest_line, longest_line, floor_path, ceil_path, floor_path_dy_map: dyMap };
+        }
+
+        function computeActualLineLengthJS(actualPath, targetLen, sourceLen, lct, dyMap) {
+            if (!actualPath || actualPath.length <= 1) return 0.0;
+            let len = 0;
+            const ratio = sourceLen > 0 ? targetLen / sourceLen : 0;
+            const mappingWindowH = Math.ceil(ratio);
+            const ratioDec = ratio - Math.floor(ratio);
+            let lctBase;
+            if (targetLen <= sourceLen) lctBase = mappingWindowH;
+            else lctBase = (ratioDec > 0 && ratioDec <= 0.5) ? (2 * mappingWindowH) - 2 : (2 * mappingWindowH) - 1;
+            const expandedLct = lctBase * (1 + lct);
+
+            for (let i = 0; i < actualPath.length - 1; i++) {
+                const p1 = actualPath[i], p2 = actualPath[i+1];
+                const dx = p2.x - p1.x, dyRaw = p2.y - p1.y;
+                if (dx <= 0) continue;
+                
+                const dyValue = lct > 0 ? Math.abs(dyRaw) : dyRaw;
+                
+                if (dyValue <= lctBase && dyValue >= 0) {
+                    len += Math.sqrt(dx**2 + dyRaw**2);
+                } 
+                else if (lct > 0 && dyValue > lctBase && dyValue <= expandedLct) {
+                    if (dyMap && dyMap[p1.x] !== undefined) {
+                        const floorDy = dyMap[p1.x];
+                        len += Math.sqrt(dx**2 + floorDy**2);
+                    }
+                }
+            }
+            return len;
+        }
+
+        function calculateLineNAS(floor, ceil, actual) {
+            if (floor === 0 && ceil === 0) return 1.0;
+            if (actual >= floor && actual <= ceil) return 1.0;
+            if (actual < floor) return floor > 0 ? actual / floor : 0.0;
+            return actual > 0 ? ceil / actual : 0.0;
+        }
+
+        // Window Regularizer calculation
+        function calculateWindowRegularizer(refLen, genLen) {
+            const mappingWindows = get_mapping_windows_generic(genLen, refLen);
+            let totalMappingWindowArea = 0;
+            for (const window of mappingWindows) {
+                if (window) {
+                    const mappingWindowHeight = window.end - window.start;
+                    totalMappingWindowArea += mappingWindowHeight * 1;
+                }
+            }
+            const timelineArea = refLen * genLen;
+            const maxLen = Math.max(refLen, genLen);
+            const minAreaVal = maxLen > 0 ? 1 / maxLen : 0;
+            
+            let windowRegularizerVal;
+            if (timelineArea > 0 && minAreaVal < 0.5 && (0.5 - minAreaVal) > 1e-9 ) {
+                windowRegularizerVal = ( (totalMappingWindowArea / timelineArea) - minAreaVal) / (0.5 - minAreaVal);
+                windowRegularizerVal = Math.max(0, Math.min(1, windowRegularizerVal));
+            } else if (timelineArea > 0 && minAreaVal >= 0.5) {
+                 windowRegularizerVal = (totalMappingWindowArea / timelineArea <= minAreaVal + 1e-9) ? 0 : 1;
+            } else {
+                windowRegularizerVal = 0;
+            }
+            
+            return {
+                windowRegularizer: windowRegularizerVal,
+                timelineArea: timelineArea,
+                totalMappingWindowArea: totalMappingWindowArea,
+                minArea: minAreaVal
+            };
+        }
+
+        function regularizeNAS(nasF1, windowRegularizer) {
+            const nasRegularized = nasF1 - windowRegularizer;
+            if (nasRegularized <= 0) return 0.0;
+            if (Math.abs(1 - windowRegularizer) < 1e-9) return 0.0;
+            return nasRegularized / (1 - windowRegularizer);
+        }
+
+        function initializeActualPath(chartType, simMatrix, mappingWindowsForX, sourceLen, targetLen) {
+            actualPathPositions[chartType] = [];
+            if (sourceLen === 0 || targetLen === 0 || simMatrix.length === 0 || simMatrix[0].length === 0) return;
+            for (let x_idx = 0; x_idx < sourceLen; x_idx++) {
+                const columnSimilarity = simMatrix[x_idx];
+                const currentMappingWindow = mappingWindowsForX[x_idx];
+                const matchInfo = findBestMatchWithContextJS(columnSimilarity, currentMappingWindow, 0.6, 4.0);
+                let y_match_idx = matchInfo.bestMatchIndex;
+                 if (y_match_idx === -1) {
+                    y_match_idx = currentMappingWindow ? Math.floor((currentMappingWindow.start + currentMappingWindow.end) / 2) : Math.floor(targetLen / 2);
+                }
+                actualPathPositions[chartType].push({ x: x_idx, y: y_match_idx });
+            }
+        }
+
+        // --- RENDERING FUNCTIONS ---
+        function renderSegmentLists() {
+            function populateList(ul, masterChunks, activeIndices, type) {
+                ul.innerHTML = '';
+                const activeSet = new Set(activeIndices);
+                const listItems = masterChunks.map((text, index) => {
+                    const li = document.createElement('li');
+                    const isActive = activeSet.has(index);
+                    li.dataset.originalIndex = index;
+                    li.dataset.chunkType = type;
+                    li.textContent = `${type.slice(0,3).toUpperCase()} ${index}: ${text}`;
+                    li.classList.toggle('inactive-chunk', !isActive);
+                    li.setAttribute('draggable', isActive);
+                    li.addEventListener('click', () => toggleChunkActiveState(type, index));
+                    return { li, isActive, originalIndex: index };
+                });
+
+                activeIndices.forEach(activeIndex => {
+                    const item = listItems.find(it => it.originalIndex === activeIndex);
+                    if (item) ul.appendChild(item.li);
+                });
+                
+                listItems.forEach(item => {
+                    if (!item.isActive) ul.appendChild(item.li);
+                });
+            }
+            document.getElementById('activeRefChunkCount').textContent = activeReferenceIndices.length;
+            document.getElementById('totalRefChunkCount').textContent = masterReferenceChunks.length;
+            document.getElementById('activeGenChunkCount').textContent = activeGeneratedIndices.length;
+            document.getElementById('totalGenChunkCount').textContent = masterGeneratedChunks.length;
+
+            populateList(referenceSegmentsUl, masterReferenceChunks, activeReferenceIndices, 'reference');
+            populateList(generatedSegmentsUl, masterGeneratedChunks, activeGeneratedIndices, 'generated');
+        }
+        
+        function renderChart(chartType, results) {
+            const chartUI = charts[chartType];
+            const isRecall = chartType === 'recall';
+            const sourceLen = isRecall ? activeReferenceIndices.length : activeGeneratedIndices.length;
+            const targetLen = isRecall ? activeGeneratedIndices.length : activeReferenceIndices.length;
+            
+            chartUI.idealContainer.innerHTML = ''; chartUI.lctContainer.innerHTML = '';
+            chartUI.markerContainer.innerHTML = ''; chartUI.axisX.innerHTML = ''; chartUI.axisY.innerHTML = '';
+            chartUI.idealPathsSvg.innerHTML = ''; chartUI.actualPathSvg.innerHTML = '';
+
+            requestAnimationFrame(() => {
+                if (sourceLen > 0 && targetLen > 0) {
+                    chartUI.grid.style.backgroundImage = `linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px)`;
+                    chartUI.grid.style.backgroundSize = `calc(100% / ${sourceLen}) calc(100% / ${targetLen})`;
+                } else { chartUI.grid.style.backgroundImage = 'none'; }
+            });
+            if (sourceLen === 0 || targetLen === 0) return;
+            
+            const idealWindows = get_mapping_windows_generic(sourceLen, targetLen);
+
+            idealWindows.forEach((window, x_idx) => {
+                if (!window) return;
+                const startY = window.start; const endY = window.end; const height = endY - startY;
+                const idealDiv = document.createElement('div');
+                idealDiv.className = 'ideal-mapping-window';
+                idealDiv.style.left = `calc(${x_idx} * 100% / ${sourceLen})`; idealDiv.style.width = `calc(100% / ${sourceLen})`;
+                idealDiv.style.bottom = `calc(${startY} * 100% / ${targetLen})`; idealDiv.style.height = `calc(${height} * 100% / ${targetLen})`;
+                chartUI.idealContainer.appendChild(idealDiv);
+                
+                const lctStartY = Math.max(0, startY - currentLct); const lctEndY = Math.min(targetLen, endY + currentLct);
+                const lctHeight = lctEndY - lctStartY;
+                const lctDiv = document.createElement('div');
+                lctDiv.className = 'lct-padding-window';
+                lctDiv.style.left = idealDiv.style.left; lctDiv.style.width = idealDiv.style.width;
+                lctDiv.style.bottom = `calc(${lctStartY} * 100% / ${targetLen})`; lctDiv.style.height = `calc(${lctHeight} * 100% / ${targetLen})`;
+                chartUI.lctContainer.appendChild(lctDiv);
+            });
+
+            const { markerPenalties } = results.nasD;
+            const penaltyMap = new Map(markerPenalties.map(p => [p.id, p.penalty]));
+            markerPositions[chartType].forEach(marker => {
+                const markerDiv = document.createElement('div');
+                markerDiv.className = 'gen-marker'; markerDiv.dataset.id = marker.id; markerDiv.dataset.chartType = chartType;
+                const penalty = penaltyMap.get(marker.id) || 0;
+                const penaltyLabel = document.createElement('span');
+                penaltyLabel.className = 'marker-penalty-label';
+                if (penalty > 0) { penaltyLabel.textContent = `-${penalty}`; penaltyLabel.style.display = 'block'; }
+                markerDiv.appendChild(penaltyLabel);
+                markerDiv.style.left = `calc(${(marker.id + 0.5)} * 100% / ${sourceLen} - 6px)`;
+                markerDiv.style.bottom = `calc(${(marker.currentY + 0.5)} * 100% / ${targetLen} - 6px)`;
+                chartUI.markerContainer.appendChild(markerDiv);
+            });
+
+            const yIndices = isRecall ? activeGeneratedIndices : activeReferenceIndices;
+            const xIndices = isRecall ? activeReferenceIndices : activeGeneratedIndices;
+            
+            const yStep = Math.max(1, Math.ceil(targetLen / 8));
+            for (let i = 0; i < targetLen; i += yStep) {
+                const lbl = document.createElement('div'); lbl.className = 'axis-label'; lbl.textContent = yIndices[i];
+                lbl.style.left = '-1rem'; lbl.style.top = `calc(100% - (${i}*100%/${targetLen}) - (50%/${targetLen}))`;
+                lbl.style.transform = 'translateY(-50%) translateX(-100%)'; chartUI.axisY.appendChild(lbl);
+            }
+            if (targetLen > 1 && (targetLen-1) % yStep !== 0) {
+                const lbl = document.createElement('div'); lbl.className = 'axis-label'; lbl.textContent = yIndices[targetLen-1];
+                lbl.style.left = '-1rem'; lbl.style.top = `calc(100% - (${targetLen-1}*100%/${targetLen}) - (50%/${targetLen}))`;
+                lbl.style.transform = 'translateY(-50%) translateX(-100%)'; chartUI.axisY.appendChild(lbl);
+            }
+            const xStep = Math.max(1, Math.ceil(sourceLen / 8));
+            for (let i = 0; i < sourceLen; i += xStep) {
+                const lbl = document.createElement('div'); lbl.className = 'axis-label'; lbl.textContent = xIndices[i];
+                lbl.style.bottom = '-1.5rem'; lbl.style.left = `calc(${i}*100%/${sourceLen} + 50%/${sourceLen})`;
+                lbl.style.transform = 'translateX(-50%)'; chartUI.axisX.appendChild(lbl);
+            }
+            if (sourceLen > 1 && (sourceLen-1) % xStep !== 0) {
+                const lbl = document.createElement('div'); lbl.className = 'axis-label'; lbl.textContent = xIndices[sourceLen - 1];
+                lbl.style.bottom = '-1.5rem'; lbl.style.left = `calc(${sourceLen - 1}*100%/${sourceLen} + 50%/${sourceLen})`;
+                lbl.style.transform = 'translateX(-50%)'; chartUI.axisX.appendChild(lbl);
+            }
+
+            // Render SVG paths for Line NAS
+            const chartWidth = chartUI.grid.clientWidth;
+            const chartHeight = chartUI.grid.clientHeight;
+            const drawPath = (svg, pathData, className) => {
+                svg.innerHTML = '';
+                if (!pathData || pathData.length === 0 || !(chartWidth > 0) || !(chartHeight > 0)) return;
+                const points = pathData.map(p => `${(p.x + 0.5) * (chartWidth / sourceLen)},${chartHeight - ((p.y + 0.5) * (chartHeight / targetLen))}`).join(' ');
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+                line.setAttribute('points', points); line.setAttribute('class', className);
+                svg.appendChild(line);
+            };
+
+            if (results.nasL && results.nasL.idealBand) {
+                drawPath(chartUI.idealPathsSvg, results.nasL.idealBand.floor_path, 'floor-path-line');
+                drawPath(chartUI.idealPathsSvg, results.nasL.idealBand.ceil_path, 'ceil-path-line');
+            }
+            drawPath(chartUI.actualPathSvg, actualPathPositions[chartType], 'actual-path-line');
+        }
+        
+        // --- EVENT HANDLERS & MAIN UPDATE FUNCTION ---
+        function handleSegmentDragStart(e) {
+            if (!e.target.getAttribute('draggable')) return;
+            draggedItemInfo.element = e.target;
+            draggedItemInfo.originalIndex = parseInt(e.target.dataset.originalIndex);
+            draggedItemInfo.type = e.target.dataset.chunkType;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedItemInfo.originalIndex);
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+
+        function handleSegmentDragOver(e) {
+            e.preventDefault();
+            const listUl = e.target.closest('ul');
+            if (!listUl || (listUl.id !== `${draggedItemInfo.type}SegmentsUl`)) return;
+            if (!draggedItemInfo.placeholder) {
+                draggedItemInfo.placeholder = document.createElement('li');
+                draggedItemInfo.placeholder.className = 'drag-placeholder';
+                draggedItemInfo.placeholder.textContent = 'Drop here';
+            }
+            const targetLi = e.target.closest('li:not(.inactive-chunk):not(.dragging)');
+            if (targetLi && targetLi.dataset.chunkType === draggedItemInfo.type) {
+                const rect = targetLi.getBoundingClientRect();
+                const isAfter = e.clientY > rect.top + rect.height / 2;
+                listUl.insertBefore(draggedItemInfo.placeholder, isAfter ? targetLi.nextSibling : targetLi);
+            } else if (!listUl.querySelector('.drag-placeholder')) {
+                const firstActive = listUl.querySelector('li[draggable="true"]');
+                if (firstActive) {
+                    listUl.insertBefore(draggedItemInfo.placeholder, firstActive);
+                } else {
+                    listUl.appendChild(draggedItemInfo.placeholder);
+                }
+            }
+        }
+        
+        function handleSegmentDrop(e) {
+            e.preventDefault();
+            if (!draggedItemInfo.placeholder || !draggedItemInfo.placeholder.parentNode) return;
+            
+            const activeIndicesArray = draggedItemInfo.type === 'reference' ? activeReferenceIndices : activeGeneratedIndices;
+            const fromIndex = activeIndicesArray.indexOf(draggedItemInfo.originalIndex);
+            activeIndicesArray.splice(fromIndex, 1);
+            
+            const listItems = Array.from(draggedItemInfo.placeholder.parentNode.children);
+            const toIndex = listItems.filter(li => li.getAttribute('draggable') === 'true' || li.classList.contains('drag-placeholder')).indexOf(draggedItemInfo.placeholder);
+            activeIndicesArray.splice(toIndex, 0, draggedItemInfo.originalIndex);
+            
+            draggedItemInfo.placeholder.remove();
+            
+            initializeAppState();
+            updateAndRenderAll();
+        }
+
+        function handleSegmentDragEnd() {
+            if (draggedItemInfo.element) draggedItemInfo.element.classList.remove('dragging');
+            if (draggedItemInfo.placeholder && draggedItemInfo.placeholder.parentNode) draggedItemInfo.placeholder.remove();
+            draggedItemInfo = { element: null, originalIndex: null, type: null, placeholder: null };
+        }
+
+        function handleMarkerMouseDown(e) {
+            if (!e.target.classList.contains('gen-marker')) return;
+            e.preventDefault();
+            const markerElement = e.target;
+            draggedMarkerInfo = {
+                chartType: markerElement.dataset.chartType, id: parseInt(markerElement.dataset.id),
+                element: markerElement, chartGrid: charts[markerElement.dataset.chartType].grid, startY: e.clientY
+            };
+            markerElement.classList.add('dragging'); document.body.style.cursor = 'ns-resize';
+            document.addEventListener('mousemove', handleMarkerMouseMove); document.addEventListener('mouseup', handleMarkerMouseUp);
+        }
+
+        function handleMarkerMouseMove(e) {
+            if (!draggedMarkerInfo.chartGrid) return;
+            const { chartType, id, chartGrid } = draggedMarkerInfo;
+            const isRecall = chartType === 'recall';
+            const targetLen = isRecall ? activeReferenceIndices.length : activeGeneratedIndices.length;
+            const rect = chartGrid.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            let newYIndex = Math.floor((1 - (y / rect.height)) * targetLen);
+            newYIndex = Math.max(0, Math.min(targetLen - 1, newYIndex));
+            const markerToUpdate = markerPositions[chartType].find(m => m.id === id);
+            const pathToUpdate = actualPathPositions[chartType].find(m => m.x === id);
+            if (markerToUpdate && markerToUpdate.currentY !== newYIndex) {
+                markerToUpdate.currentY = newYIndex;
+                if (pathToUpdate) pathToUpdate.y = newYIndex;
+                updateAndRenderAll();
+            }
+        }
+
+        function handleMarkerMouseUp() {
+            if (draggedMarkerInfo.element) draggedMarkerInfo.element.classList.remove('dragging');
+            document.body.style.cursor = 'default';
+            draggedMarkerInfo = { chartType: null, id: null, element: null, chartGrid: null, startY: 0 };
+            document.removeEventListener('mousemove', handleMarkerMouseMove); document.removeEventListener('mouseup', handleMarkerMouseUp);
+        }
+
+        function toggleChunkActiveState(type, originalIndex) {
+            let activeIndicesArray = (type === 'reference') ? activeReferenceIndices : activeGeneratedIndices;
+            const minChunks = 1;
+            const currentIndexPositionInActive = activeIndicesArray.indexOf(originalIndex);
+            if (currentIndexPositionInActive > -1) { 
+                if (activeIndicesArray.length > minChunks) { activeIndicesArray.splice(currentIndexPositionInActive, 1); } else { return; } 
+            } else { activeIndicesArray.push(originalIndex); }
+            activeReferenceIndices.sort((a,b)=>a-b); activeGeneratedIndices.sort((a,b)=>a-b);
+            initializeAppState(); updateAndRenderAll();
+        }
+
+        function resetSegmentOrder(type) {
+            if (type === 'generated') {
+                activeGeneratedIndices.sort((a, b) => a - b);
+            } else {
+                activeReferenceIndices.sort((a, b) => a - b);
+            }
+            initializeAppState(); updateAndRenderAll();
+        }
+
+        function initializeAppState() {
+            ['precision', 'recall'].forEach(chartType => {
+                const isRecall = chartType === 'recall';
+                const sourceLen = isRecall ? activeGeneratedIndices.length : activeReferenceIndices.length;
+                const targetLen = isRecall ? activeReferenceIndices.length : activeGeneratedIndices.length;
+                const simMatrix = buildCurrentSimilarityMatrix(isRecall);
+                const mappingWindows = get_mapping_windows_generic(sourceLen, targetLen);
+                
+                // Initialize markers for NAS-D
+                markerPositions[chartType] = [];
+                if (sourceLen > 0 && targetLen > 0) {
+                     for (let i = 0; i < sourceLen; i++) {
+                        const similarityColumn = simMatrix[i]; // Matrix is already transposed
+                        const bestMatchIdx = findBestMatchIndex(similarityColumn);
+                        markerPositions[chartType][i] = { id: i, currentY: bestMatchIdx };
+                    }
+                }
+                
+                // Initialize paths for NAS-L
+                initializeActualPath(chartType, simMatrix, mappingWindows, sourceLen, targetLen);
+            });
+            const maxPrecisionTargetLen = activeReferenceIndices.length;
+            const maxRecallTargetLen = activeGeneratedIndices.length;
+            lctSlider.max = Math.max(0, Math.min(maxPrecisionTargetLen, maxRecallTargetLen) - 1);
+            if (parseInt(lctSlider.value) > parseInt(lctSlider.max)) lctSlider.value = lctSlider.max;
+        }
+
+        function updateAndRenderAll() {
+            currentLct = parseInt(lctSlider.value); lctValueDisplay.textContent = currentLct;
+            
+            const numActiveRef = activeReferenceIndices.length;
+            const numActiveGen = activeGeneratedIndices.length;
+
+            // --- Precision Calculations ---
+            const precNasDResults = calculatePenaltiesAndNAS('precision');
+            const nasDPrecision = precNasDResults.nas;
+
+            const precSourceLenL = activeGeneratedIndices.length;
+            const precTargetLenL = activeReferenceIndices.length;
+            const precMappingWindows = get_mapping_windows_generic(precSourceLenL, precTargetLenL);
+            const precIdealBand = computeIdealNarrativeLineBandJS(precMappingWindows, precSourceLenL, precTargetLenL);
+            const precActualLen = computeActualLineLengthJS(actualPathPositions.precision, precTargetLenL, precSourceLenL, currentLct, precIdealBand.floor_path_dy_map);
+            const precNasL = calculateLineNAS(precIdealBand.shortest_line, precIdealBand.longest_line, precActualLen);
+            
+            // --- Recall Calculations ---
+            const recallNasDResults = calculatePenaltiesAndNAS('recall');
+            const nasDRecall = recallNasDResults.nas;
+            
+            const recallSourceLenL = activeReferenceIndices.length;
+            const recallTargetLenL = activeGeneratedIndices.length;
+            const recallMappingWindows = get_mapping_windows_generic(recallSourceLenL, recallTargetLenL);
+            const recallIdealBand = computeIdealNarrativeLineBandJS(recallMappingWindows, recallSourceLenL, recallTargetLenL);
+            const recallActualLen = computeActualLineLengthJS(actualPathPositions.recall, recallTargetLenL, recallSourceLenL, currentLct, recallIdealBand.floor_path_dy_map);
+            const recallNasL = calculateLineNAS(recallIdealBand.shortest_line, recallIdealBand.longest_line, recallActualLen);
+
+            // --- Combined & Final Calculations ---
+            const nasDf1 = _calculate_f1(nasDPrecision, nasDRecall);
+            const nasLf1 = _calculate_f1(precNasL, recallNasL);
+            const combinedF1NAS = _calculate_f1(nasDf1, nasLf1);
+            const regResults = calculateWindowRegularizer(numActiveRef, numActiveGen);
+            const windowRegularizer = regResults.windowRegularizer;
+            const finalNAS = regularizeNAS(combinedF1NAS, windowRegularizer);
+
+            // --- Update UI ---
+            renderSegmentLists();
+            
+            const precisionResults = {
+                nasD: precNasDResults,
+                nasL: { idealBand: precIdealBand, actualLength: precActualLen, score: precNasL }
+            };
+            const recallResults = {
+                nasD: recallNasDResults,
+                nasL: { idealBand: recallIdealBand, actualLength: recallActualLen, score: recallNasL }
+            };
+            
+            requestAnimationFrame(() => {
+                renderChart('precision', precisionResults);
+                renderChart('recall', recallResults);
+            });
+            
+            // Update Pipeline Display
+            document.getElementById('pipeline-nasd-precision').textContent = nasDPrecision.toFixed(3);
+            document.getElementById('pipeline-nasd-recall').textContent = nasDRecall.toFixed(3);
+            document.getElementById('pipeline-nasl-precision').textContent = precNasL.toFixed(3);
+            document.getElementById('pipeline-nasl-recall').textContent = recallNasL.toFixed(3);
+            document.getElementById('pipeline-f1-nas').textContent = combinedF1NAS.toFixed(3);
+            document.getElementById('pipeline-regularizer').textContent = windowRegularizer.toFixed(3);
+            document.getElementById('pipeline-final-nas').textContent = finalNAS.toFixed(3);
+
+            // Update Detailed Metrics
+            document.getElementById('detailed-nasd-precision').textContent = nasDPrecision.toFixed(3);
+            document.getElementById('detailed-nasd-recall').textContent = nasDRecall.toFixed(3);
+            document.getElementById('detailed-nasd-f1').textContent = nasDf1.toFixed(3);
+            document.getElementById('detailed-nasl-precision').textContent = precNasL.toFixed(3);
+            document.getElementById('detailed-nasl-recall').textContent = recallNasL.toFixed(3);
+            document.getElementById('detailed-nasl-f1').textContent = nasLf1.toFixed(3);
+            document.getElementById('detailed-reg-timeline').textContent = regResults.timelineArea.toFixed(0);
+            document.getElementById('detailed-reg-window').textContent = regResults.totalMappingWindowArea.toFixed(0);
+            document.getElementById('detailed-reg-value').textContent = windowRegularizer.toFixed(3);
+
+            // Update Final Score Display
+            document.getElementById('finalCompleteNas').textContent = finalNAS.toFixed(3);
+            document.getElementById('summary-nasd').textContent = nasDf1.toFixed(3);
+            document.getElementById('summary-nasl').textContent = nasLf1.toFixed(3);
+            document.getElementById('summary-f1').textContent = combinedF1NAS.toFixed(3);
+            document.getElementById('summary-reg').textContent = windowRegularizer.toFixed(3);
+        }
+        
+        // --- INITIALIZATION ---
+        window.addEventListener('load', () => {
+            activeReferenceIndices = Array.from({ length: masterReferenceChunks.length }, (_, i) => i);
+            activeGeneratedIndices = Array.from({ length: masterGeneratedChunks.length }, (_, i) => i);
+            
+            lctSlider.addEventListener('input', updateAndRenderAll);
+            resetGenOrderBtn.addEventListener('click', () => resetSegmentOrder('generated'));
+            resetRefOrderBtn.addEventListener('click', () => resetSegmentOrder('reference'));
+            [generatedSegmentsUl, referenceSegmentsUl].forEach(ul => {
+                ul.addEventListener('dragstart', handleSegmentDragStart);
+                ul.addEventListener('dragover', handleSegmentDragOver);
+                ul.addEventListener('drop', handleSegmentDrop);
+                ul.addEventListener('dragend', handleSegmentDragEnd);
+            });
+            document.addEventListener('mousedown', handleMarkerMouseDown);
+            
+            let resizeTimer;
+            window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(updateAndRenderAll, 150); });
+            
+            initializeAppState();
+            updateAndRenderAll();
+        });
+    </script>
+</body>
+</html>
