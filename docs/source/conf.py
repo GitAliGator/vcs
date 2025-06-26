@@ -4,19 +4,9 @@ import os
 import sys
 
 # -- Path setup --------------------------------------------------------------
-# Add the src directory to Python path so we can import vcs
 sys.path.insert(0, os.path.abspath('../../src'))
-sys.path.insert(0, os.path.abspath('../../'))
 
-# Verify the package can be imported
-try:
-    import vcs
-    print(f"✓ Successfully imported vcs package from {vcs.__file__}")
-    print(f"✓ VCS version: {vcs.__version__}")
-    print(f"✓ Available functions: {', '.join([attr for attr in dir(vcs) if not attr.startswith('_')])}")
-except ImportError as e:
-    print(f"✗ Failed to import vcs package: {e}")
-    print(f"✗ Python path: {sys.path}")
+# No more mocking needed since we have real dependencies installed!
 
 # -- Project information -----------------------------------------------------
 project = 'VCS Metrics'
@@ -33,6 +23,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    # Re-enable now that we have real dependencies
     'sphinx_autodoc_typehints',
 ]
 
@@ -45,7 +36,7 @@ html_static_path = ['_static']
 
 # -- Extension configuration -------------------------------------------------
 
-# Napoleon settings for Google/NumPy style docstrings
+# Napoleon settings
 napoleon_google_style = True
 napoleon_numpy_style = True
 napoleon_include_init_with_doc = False
@@ -70,10 +61,7 @@ autodoc_default_options = {
     'exclude-members': '__weakref__'
 }
 
-# Import error handling
-autodoc_mock_imports = []
-
-# Type hints settings
+# Type hints settings - now that we have real dependencies
 typehints_fully_qualified = False
 always_document_param_types = True
 typehints_document_rtype = True
@@ -88,6 +76,11 @@ intersphinx_mapping = {
 
 # Auto-generate summary pages
 autosummary_generate = True
+
+# Custom CSS
+def setup(app):
+    app.add_css_file('custom.css')
+    #pass
 
 # HTML theme options
 html_theme_options = {
@@ -126,28 +119,3 @@ html_show_copyright = True
 
 # Output file base name for HTML help builder
 htmlhelp_basename = 'VCSMetricsdoc'
-
-# Custom CSS
-def setup(app):
-    app.add_css_file('custom.css')
-
-# Add debug information
-def setup_finished(app, exception):
-    if exception is None:
-        print("✓ Sphinx setup completed successfully")
-    else:
-        print(f"✗ Sphinx setup failed: {exception}")
-
-def build_finished(app, exception):
-    if exception is None:
-        print("✓ Sphinx build completed successfully")
-    else:
-        print(f"✗ Sphinx build failed: {exception}")
-
-def connect_events(app):
-    app.connect('build-finished', build_finished)
-
-# Connect the events
-def setup(app):
-    app.add_css_file('custom.css')
-    connect_events(app)
