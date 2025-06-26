@@ -1,5 +1,5 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Workflow for deploying VCS website and documentation to GitHub Pages
+name: Deploy VCS Website to Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -31,13 +31,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        
+      - name: Prepare website files
+        run: |
+          # Ensure the docs directory structure is correct
+          ls -la docs/
+          echo "Contents of docs/build/html/:"
+          ls -la docs/build/html/ || echo "build/html directory not found"
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
+          # Upload the docs directory which contains the main website
           path: './docs'
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
