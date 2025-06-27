@@ -40,8 +40,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r docs/requirements.txt
+          # Install the package first so autodoc can import it
           pip install -e .
+          # Install documentation dependencies
+          pip install -r docs/requirements.txt
+          
+      - name: Debug package installation
+        run: |
+          python -c "import vcs; print(f'✅ VCS version: {vcs.__version__}')"
+          python -c "from vcs import compute_vcs_score; print('✅ Main function imported')"
           
       - name: Build Sphinx documentation
         run: |
