@@ -1,3 +1,5 @@
+-e ../
+
 # Sphinx and extensions
 sphinx>=4.0
 sphinx-rtd-theme>=1.0
