@@ -77,21 +77,6 @@ intersphinx_mapping = {
 # Auto-generate summary pages
 autosummary_generate = True
 
-# Mock heavy dependencies during documentation build to avoid import errors
-# This ensures that Sphinx can import the VCS package even if these optional
-# libraries are not available in the docs build environment (e.g. ReadTheDocs).
-autodoc_mock_imports = [
-    "torch",
-    "numpy",
-    "matplotlib",
-    "sentence_transformers",
-    "spacy",
-    "PIL",
-    "cv2",
-    "scipy",
-    "sklearn",
-]
-
 # Custom CSS
 def setup(app):
     app.add_css_file('custom.css')
