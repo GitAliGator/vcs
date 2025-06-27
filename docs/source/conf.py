@@ -4,8 +4,9 @@ import os
 import sys
 
 # -- Path setup --------------------------------------------------------------
-# Remove this line since we're using the installed package:
-# sys.path.insert(0, os.path.abspath('../../src'))
+sys.path.insert(0, os.path.abspath('../../src'))
+
+# No more mocking needed since we have real dependencies installed!
 
 # -- Project information -----------------------------------------------------
 project = 'VCS Metrics'
@@ -22,6 +23,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    # Re-enable now that we have real dependencies
     'sphinx_autodoc_typehints',
 ]
 
@@ -59,7 +61,7 @@ autodoc_default_options = {
     'exclude-members': '__weakref__'
 }
 
-# Type hints settings
+# Type hints settings - now that we have real dependencies
 typehints_fully_qualified = False
 always_document_param_types = True
 typehints_document_rtype = True
@@ -78,6 +80,7 @@ autosummary_generate = True
 # Custom CSS
 def setup(app):
     app.add_css_file('custom.css')
+    #pass
 
 # HTML theme options
 html_theme_options = {
