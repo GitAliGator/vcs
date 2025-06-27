@@ -1,12 +1,18 @@
-# Configuration file for the Sphinx documentation builder.
-
+# At the top of conf.py, replace the current path setup:
 import os
 import sys
 
-# -- Path setup --------------------------------------------------------------
+# Add the src directory to Python path
 sys.path.insert(0, os.path.abspath('../../src'))
+sys.path.insert(0, os.path.abspath('../../'))
 
-# No more mocking needed since we have real dependencies installed!
+# Try to import the package to verify it's available
+try:
+    import vcs
+    print(f"✅ Successfully imported vcs package: {vcs.__version__}")
+except ImportError as e:
+    print(f"❌ Failed to import vcs package: {e}")
+    # You might want to add mock imports here if needed
 
 # -- Project information -----------------------------------------------------
 project = 'VCS Metrics'
