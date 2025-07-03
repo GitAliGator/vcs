@@ -110,7 +110,7 @@ git commit -m "patch: fix issue"
 ### TestPyPI (Staging)
 - **URL**: https://test.pypi.org/project/vcs-metrics/
 - **Purpose**: Automated testing of package releases
-- **Trigger**: Every push to `main` branch
+- **Trigger**: GitHub releases and version tags
 - **Authentication**: Trusted Publishing (OIDC)
 
 ### PyPI (Production)
@@ -201,7 +201,7 @@ git push origin v1.2.0
 ### GitHub Actions Workflows
 - **`.github/workflows/test.yml`**: Continuous testing (every PR/push)
 - **`.github/workflows/publish.yml`**: Release publishing (GitHub releases)
-- **`.github/workflows/docs.yml`**: Documentation deployment
+- **`.github/workflows/deploy-docs.yml`**: Documentation deployment
 
 ### Security
 - **Trusted Publishing**: No API keys stored in repository

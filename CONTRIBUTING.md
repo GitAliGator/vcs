@@ -15,6 +15,8 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install development dependencies
+# Note: PyTorch is required but not auto-installed to avoid conflicts
+pip install torch  # Install PyTorch first (see https://pytorch.org)
 pip install -e .[dev]
 ```
 
@@ -63,20 +65,23 @@ git push origin feature/your-feature-name
 - **mypy** for type checking: `mypy src/`
 
 ### Testing
-- Add tests for new functionality
-- Ensure all tests pass: `pytest`
-- Maintain test coverage
+- Testing is integrated into CI/CD workflows
+- All functionality is tested automatically via comprehensive CI tests
+- Tests include package validation, API testing, and integration testing
+- No separate test files - testing occurs in `.github/workflows/test.yml`
 
 ### Documentation
 - Update docstrings for new functions/classes
 - Add examples for new features
 - Update README if needed
+- Website content includes copyright notices and proper attribution
+- CLIP-CC dataset integration for benchmarking video models
 
 ## 🔄 Automated Workflows
 
 ### **Continuous Testing** (Every PR/Push)
 When you submit a PR or push to main:
-1. **Automated Testing**: Runs on Python 3.8-3.12
+1. **Automated Testing**: Runs on Python 3.11 & 3.12
 2. **Code Quality Checks**: Linting, formatting, type checking  
 3. **Build Verification**: Ensures package builds correctly
 4. **Fast Feedback**: Results in ~2-3 minutes
@@ -125,9 +130,16 @@ vcs/
 │   ├── _metrics/           # Core metrics implementations
 │   ├── _visualize_vcs/     # Visualization components
 │   └── scorer.py           # Main API
-├── docs/                   # Documentation source
-├── tests/                  # Test suite (if exists)
+├── docs/                   # Documentation and website
+│   ├── sphinx/             # Sphinx documentation source
+│   ├── assets/             # Website assets (CSS, JS, videos)
+│   ├── pages/              # Website pages
+│   ├── widgets/            # Interactive widgets
+│   └── index.html          # Main website
 ├── .github/workflows/      # CI/CD pipelines
+│   ├── test.yml           # Continuous testing
+│   ├── publish.yml        # Package publishing
+│   └── deploy-docs.yml    # Documentation deployment
 ├── pyproject.toml         # Package configuration
 ├── DEPLOYMENT.md          # Deployment guide
 └── CONTRIBUTING.md        # This file
