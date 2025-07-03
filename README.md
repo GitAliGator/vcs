@@ -43,13 +43,66 @@ VCS focuses on whether the overall story and narrative structure matches rather 
 - **🎯 Local Alignment Score (LAS)**: Assesses fine-grained semantic correspondence with optimal chunk-level matching
 - **📖 Narrative Alignment Score (NAS)**: Evaluates chronological consistency with configurable tolerance for narrative flexibility
 
-**Key Applications:**
-- **🎬 Video Comprehension Evaluation**: Assess video language models' understanding of video narratives
-- **📄 Document-Level Similarity**: Compare semantic alignment between long documents  
-- **📝 Paragraph-Level Similarity**: Evaluate narrative coherence within text sections
-- **📖 Story Comparison**: Measure similarity between different narratives and stories
-- **🎓 Conceptual Similarity**: Detect conceptual plagiarism and idea overlap
-- **🤖 AI Model Benchmarking**: Standardized evaluation for narrative AI systems
+## 🚀 **Key Applications**
+
+<div align="center">
+
+**🎯 Transform Your Narrative Analysis Across Every Domain**
+
+</div>
+
+<table align="center" width="100%" style="border-collapse: collapse;">
+<tr>
+<td width="33%" align="center" style="padding: 15px;">
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 20px; color: white; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+<h3 style="margin: 0 0 10px 0; font-size: 1.2em;">🎬 Video Intelligence</h3>
+<p style="margin: 0; font-size: 0.9em; opacity: 0.9;">Evaluate video language models' narrative comprehension</p>
+</div>
+</td>
+<td width="33%" align="center" style="padding: 15px;">
+<div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; padding: 20px; color: white; box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);">
+<h3 style="margin: 0 0 10px 0; font-size: 1.2em;">📄 Document Similarity</h3>
+<p style="margin: 0; font-size: 0.9em; opacity: 0.9;">Compare semantic alignment between long-form documents</p>
+</div>
+</td>
+<td width="33%" align="center" style="padding: 15px;">
+<div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 15px; padding: 20px; color: white; box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);">
+<h3 style="margin: 0 0 10px 0; font-size: 1.2em;">📖 Story Analysis</h3>
+<p style="margin: 0; font-size: 0.9em; opacity: 0.9;">Measure narrative similarity between different stories</p>
+</div>
+</td>
+</tr>
+<tr>
+<td width="33%" align="center" style="padding: 15px;">
+<div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 15px; padding: 20px; color: white; box-shadow: 0 8px 25px rgba(250, 112, 154, 0.3);">
+<h3 style="margin: 0 0 10px 0; font-size: 1.2em;">🎓 Academic Research</h3>
+<p style="margin: 0; font-size: 0.9em; opacity: 0.9;">Detect conceptual plagiarism and idea overlap</p>
+</div>
+</td>
+<td width="33%" align="center" style="padding: 15px;">
+<div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border-radius: 15px; padding: 20px; color: #2d3748; box-shadow: 0 8px 25px rgba(168, 237, 234, 0.3);">
+<h3 style="margin: 0 0 10px 0; font-size: 1.2em;">📝 Paragraph Analysis</h3>
+<p style="margin: 0; font-size: 0.9em; opacity: 0.8;">Evaluate narrative coherence within text sections</p>
+</div>
+</td>
+<td width="33%" align="center" style="padding: 15px;">
+<div style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 15px; padding: 20px; color: #2d3748; box-shadow: 0 8px 25px rgba(255, 236, 210, 0.3);">
+<h3 style="margin: 0 0 10px 0; font-size: 1.2em;">🤖 AI Benchmarking</h3>
+<p style="margin: 0; font-size: 0.9em; opacity: 0.8;">Standardized evaluation for narrative AI systems</p>
+</div>
+</td>
+</tr>
+</table>
+
+<div align="center" style="margin-top: 20px;">
+<table style="border: 2px solid #6366f1; border-radius: 12px; background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); padding: 15px;">
+<tr>
+<td align="center">
+<span style="font-size: 1.1em; font-weight: bold; color: #3730a3;">✨ Ready to revolutionize your narrative analysis?</span>
+</td>
+</tr>
+</table>
+</div>
 
 **Key Innovation:** VCS balances strict versus lenient content alignment, allowing valid descriptive variability while penalizing core narrative distortions, and integrates global and local assessments to detect structural misorderings.
 
