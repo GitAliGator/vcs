@@ -19,10 +19,6 @@
 </div>
 
 <p align="center">
-  <a href="https://github.com/hdubey-debug/vcs/issues">🐛 Report Bug</a>
-  ·
-  <a href="https://github.com/hdubey-debug/vcs/discussions">💬 Community Q&A</a>
-  ·
   <a href="https://colab.research.google.com/drive/1l6GXWNBGFM1UwGohnIu1b071bn8ekJIf?usp=sharing">📓 Interactive Notebook</a>
 </p>
 
@@ -140,16 +136,15 @@ pip install vcs-metrics
 
 <br>
 
-**Terminal Setup:**
+**Setup Commands:**
 ```bash
+# Terminal
 git clone https://github.com/hdubey-debug/vcs.git
 cd vcs
 pip install -e ".[dev]"
 pre-commit install
-```
 
-**Jupyter/Colab Setup:**
-```bash
+# Jupyter/Colab (prefix with ! and use %cd)
 !git clone https://github.com/hdubey-debug/vcs.git
 %cd vcs
 !pip install -e ".[dev]"
@@ -886,7 +881,7 @@ If you use VCS Metrics in your research, please cite:
 ```bibtex
 @software{vcs_metrics_2024,
   title = {VCS Metrics: Video Comprehension Score for Text Similarity Evaluation},
-  author = {Harsh Dubey, Mukhtiar Ali, Sugam Mishra, and Chulwoo Pack},
+  author = {Dubey, Harsh and Ali, Mukhtiar and Mishra, Sugam and Pack, Chulwoo},
   year = {2024},
   institution = {South Dakota State University},
   url = {https://github.com/hdubey-debug/vcs},
@@ -954,15 +949,9 @@ If you use VCS Metrics in your research, please cite:
 
 <div align="center">
 
-[![GitHub stars](https://img.shields.io/github/stars/hdubey-debug/vcs?style=social)](https://github.com/hdubey-debug/vcs/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/hdubey-debug/vcs?style=social)](https://github.com/hdubey-debug/vcs/network/members)
-[![GitHub issues](https://img.shields.io/github/issues/hdubey-debug/vcs?color=red)](https://github.com/hdubey-debug/vcs/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/hdubey-debug/vcs?color=blue)](https://github.com/hdubey-debug/vcs/pulls)
-
 ![Downloads](https://img.shields.io/pypi/dm/vcs-metrics?color=teal&label=PyPI%20Downloads)
 ![Contributors](https://img.shields.io/github/contributors/hdubey-debug/vcs?color=orange)
 ![Last Commit](https://img.shields.io/github/last-commit/hdubey-debug/vcs?color=green)
-
 
 </div>
 
@@ -1074,6 +1063,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Institution**: South Dakota State University  
 **Year**: 2024
 
-[⭐ Star this repo](https://github.com/hdubey-debug/vcs) • [🐛 Report Bug](https://github.com/hdubey-debug/vcs/issues) • [💡 Request Feature](https://github.com/hdubey-debug/vcs/issues) • [💬 Join Discussion](https://github.com/hdubey-debug/vcs/discussions)
+[⭐ Star this repo](https://github.com/hdubey-debug/vcs) • [🐛 Report Bug](https://github.com/hdubey-debug/vcs/issues) • [💡 Request Feature](https://github.com/hdubey-debug/vcs/issues) • [💬 Community Q&A](https://github.com/hdubey-debug/vcs/discussions)
 
 </div>
