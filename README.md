@@ -26,7 +26,9 @@
 
 ## 🤔 What is VCS?
 
-Recent advancements in Large Video Language Models (LVLMs) have enabled generation of detailed, long-form narratives from complex video content. However, effectively evaluating whether these models genuinely comprehend a video's narrative—events, entities, and their interactions—remains challenging.
+**VCS Metrics** is a Python library that provides a comprehensive approach to measuring narrative similarity between reference and generated text. Originally developed to evaluate the video comprehension ability of large video language models by comparing their long video descriptions to human-written captions, VCS can also be used for document-level similarity analysis or comparing similarity between two long stories and other narrative content.
+
+VCS focuses on whether the overall story and narrative structure matches rather than worrying about every small detail. It achieves this by checking the global, local, and chronological semantic alignment between two given long paragraphs. There is no size limit in terms of paragraphs that can be processed.
 
 **The Problem with Current Metrics:**
 - Traditional n-gram metrics (BLEU, ROUGE, CIDEr) suffer from the "many-to-one mapping" problem, penalizing valid stylistic variations
@@ -34,14 +36,103 @@ Recent advancements in Large Video Language Models (LVLMs) have enabled generati
 - Embedding-based metrics struggle with context limitations in lengthy narratives
 - LLM-driven methods lack consistency and often miss narrative structure assessment
 
-**Video Comprehension Score (VCS)** addresses these limitations by providing a novel metric that evaluates dense, long-form video descriptions both semantically and structurally. VCS is designed specifically for narrative-aware evaluation, making it perfect for assessing video captioning models, story generation systems, and any application requiring deep comprehension analysis.
+**Video Comprehension Score (VCS)** addresses these limitations by providing a novel metric that evaluates dense, long-form text both semantically and structurally. VCS is designed specifically for narrative-aware evaluation, making it perfect for assessing video captioning models, story generation systems, document similarity analysis, and any application requiring deep comprehension analysis.
 
 **VCS combines three sophisticated metrics:**
 - **🌍 Global Alignment Score (GAS)**: Measures overall thematic similarity using full-text embeddings
 - **🎯 Local Alignment Score (LAS)**: Assesses fine-grained semantic correspondence with optimal chunk-level matching
 - **📖 Narrative Alignment Score (NAS)**: Evaluates chronological consistency with configurable tolerance for narrative flexibility
 
-**Key Innovation:** VCS balances strict versus lenient content alignment, allowing valid descriptive variability while penalizing core narrative distortions, and integrates global and local assessments to detect structural misorderings.
+## 🚀 **Key Applications**
+
+VCS empowers researchers and developers across diverse domains with robust narrative similarity analysis:
+
+<table align="center" width="100%">
+<tr>
+<td width="50%" align="center">
+
+### 🎬 **Video Understanding**
+<div style="background: linear-gradient(145deg, #fef3c7, #fde68a); padding: 15px; border-radius: 10px; border: 2px solid #f59e0b;">
+
+**📹 Video Captioning Evaluation**  
+Measure how well AI models understand video narratives
+
+**🎥 Video Language Model Assessment**  
+Benchmark comprehension capabilities of large video models
+
+**📺 Content Analysis**  
+Evaluate video description quality and accuracy
+
+</div>
+
+</td>
+<td width="50%" align="center">
+
+### 📚 **Text Analysis**
+<div style="background: linear-gradient(145deg, #e0f2fe, #b3e5fc); padding: 15px; border-radius: 10px; border: 2px solid #0288d1;">
+
+**📄 Document Similarity**  
+Compare semantic alignment between documents
+
+**📝 Paragraph-Level Analysis**  
+Assess narrative coherence within text sections
+
+**📖 Story Comparison**  
+Evaluate similarity between different narratives
+
+</div>
+
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+
+### 🔍 **Academic Research**
+<div style="background: linear-gradient(145deg, #f3e8ff, #e9d5ff); padding: 15px; border-radius: 10px; border: 2px solid #7c3aed;">
+
+**🎓 Conceptual Similarity**  
+Detect conceptual plagiarism and idea overlap
+
+**📊 Research Evaluation**  
+Compare methodological approaches and findings
+
+**📋 Literature Analysis**  
+Assess thematic consistency across publications
+
+</div>
+
+</td>
+<td width="50%" align="center">
+
+### 💼 **Industry Applications**
+<div style="background: linear-gradient(145deg, #ecfdf5, #d1fae5); padding: 15px; border-radius: 10px; border: 2px solid #059669;">
+
+**🤖 AI Model Benchmarking**  
+Standardized evaluation for narrative AI systems
+
+**📱 Content Moderation**  
+Identify duplicate or similar content at scale
+
+**🔄 Content Generation**  
+Validate AI-generated text against reference material
+
+</div>
+
+</td>
+</tr>
+</table>
+
+<div align="center">
+<table style="border: 2px solid #dc2626; border-radius: 12px; background: linear-gradient(145deg, #fecaca, #fca5a5); padding: 15px; margin: 20px 0;">
+<tr>
+<td align="center">
+
+**💡 Innovation:** VCS balances strict versus lenient content alignment, allowing valid descriptive variability while penalizing core narrative distortions, and integrates global and local assessments to detect structural misorderings.
+
+</td>
+</tr>
+</table>
+</div>
 
 ---
 
@@ -329,7 +420,6 @@ For best results, we recommend these state-of-the-art models:
 - 🧠 Context-aware text splitting  
 - 🔬 Research-grade performance  
 
-📖 **Installation:** `pip install wtpsplit`  
 🔗 **Repository:** [github.com/segment-any-text/wtpsplit](https://github.com/segment-any-text/wtpsplit)
 
 </div>
@@ -353,7 +443,6 @@ For best results, we recommend these state-of-the-art models:
 - 💪 Robust multilingual support  
 - ⚡ Excellent for VCS analysis  
 
-📖 **Installation:** `pip install sentence-transformers`  
 🔗 **Model:** [nvidia/NV-Embed-v2](https://huggingface.co/nvidia/NV-Embed-v2)
 
 </div>
