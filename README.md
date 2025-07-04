@@ -457,7 +457,7 @@ Now let's see VCS in action with a complete working example:
 </div>
 
 <details>
-<summary><h3><b>🚀 Interactive Code Example</b> - Click to expand complete tutorial</h3></summary>
+<summary><h3><b>🚀 Quick Example</b> - Click to expand complete tutorial</h3></summary>
 
 <div style="background: linear-gradient(145deg, #1f2937, #111827); padding: 25px; border-radius: 15px; border: 2px solid #6366f1;">
 
