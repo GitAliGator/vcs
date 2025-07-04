@@ -683,13 +683,6 @@ Once you're comfortable with the basics, you can fine-tune VCS behavior for your
 <div style="background: linear-gradient(145deg, #ecfdf5, #d1fae5); padding: 20px; border-radius: 12px; border: 2px solid #059669;">
 
 ```python
-from vcs import (
-    DEFAULT_CONTEXT_CUTOFF_VALUE,    # 0.6
-    DEFAULT_CONTEXT_WINDOW_CONTROL,  # 4.0
-    DEFAULT_LCT,                     # 0
-    DEFAULT_CHUNK_SIZE,              # 1
-)
-
 # 🎯 Comprehensive configuration with all features enabled
 result = compute_vcs_score(
     reference_text=ref_text,
