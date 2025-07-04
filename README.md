@@ -32,11 +32,11 @@ Recent advances in Large Video Language Models (LVLMs) have significantly enhanc
 
 **Why Existing Metrics Fall Short:**
 
-**N-gram Metrics (e.g., BLEU, ROUGE, CIDEr)**: Primarily measure lexical overlap, penalizing valid linguistic variations and inadequately evaluating narrative chronology.
+- **N-gram Metrics (e.g., BLEU, ROUGE, CIDEr)**: Primarily measure lexical overlap, penalizing valid linguistic variations and inadequately evaluating narrative chronology.
 
-**Embedding-based Metrics (e.g., BERTScore, SBERT)**: Improve semantic sensitivity but struggle with extended context, detailed content alignment, and narrative sequencing.
+- **Embedding-based Metrics (e.g., BERTScore, SBERT)**: Improve semantic sensitivity but struggle with extended context, detailed content alignment, and narrative sequencing.
 
-**LLM-based Evaluations**: Often inconsistent, lacking clear criteria for narrative structure and chronology assessments.
+- **LLM-based Evaluations**: Often inconsistent, lacking clear criteria for narrative structure and chronology assessments.
 
 Moreover, traditional benchmarks largely rely on question-answering tasks, which only test isolated events or entities rather than holistic video comprehension. A model answering specific questions correctly does not necessarily demonstrate understanding of the overall narrative or the intricate interplay of events.
 
@@ -46,11 +46,11 @@ VCS is a Python library specifically designed to overcome these challenges by ev
 
 **Core Components of VCS:**
 
-🌍 **Global Alignment Score (GAS)**: Captures overall thematic alignment, tolerating stylistic variations without penalizing valid linguistic differences.
+- 🌍 **Global Alignment Score (GAS)**: Captures overall thematic alignment, tolerating stylistic variations without penalizing valid linguistic differences.
 
-🎯 **Local Alignment Score (LAS)**: Checks detailed semantic correspondence at a chunk-level, allowing minor descriptive variations while penalizing significant inaccuracies or omissions.
+- 🎯 **Local Alignment Score (LAS)**: Checks detailed semantic correspondence at a chunk-level, allowing minor descriptive variations while penalizing significant inaccuracies or omissions.
 
-📖 **Narrative Alignment Score (NAS)**: Evaluates chronological consistency, balancing the need for both strict event sequencing and permissible narrative flexibility.
+- 📖 **Narrative Alignment Score (NAS)**: Evaluates chronological consistency, balancing the need for both strict event sequencing and permissible narrative flexibility.
 
 Initially developed for evaluating video comprehension by comparing generated and human-written video narratives, VCS is versatile enough for broader applications, including document-level narrative comparisons, analysis of extensive narrative content, and various other narrative similarity tasks.
 
