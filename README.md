@@ -19,6 +19,8 @@
 </div>
 
 <p align="center">
+  <a href="https://arxiv.org/abs/placeholder-link">📄 Research Paper</a>
+  ·
   <a href="https://colab.research.google.com/drive/1l6GXWNBGFM1UwGohnIu1b071bn8ekJIf?usp=sharing">📓 Interactive Notebook</a>
 </p>
 
@@ -87,30 +89,19 @@ VCS focuses on whether the overall story and narrative structure matches rather 
 </td>
 <td width="33%" align="center" style="padding: 15px;">
 <div style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 15px; padding: 20px; color: #2d3748; box-shadow: 0 8px 25px rgba(255, 236, 210, 0.3);">
-<h3 style="margin: 0 0 10px 0; font-size: 1.2em;">🤖 AI Benchmarking</h3>
-<p style="margin: 0; font-size: 0.9em; opacity: 0.8;">Standardized evaluation for narrative AI systems</p>
+<h3 style="margin: 0 0 10px 0; font-size: 1.2em;">🎯 Short Caption Evaluation</h3>
+<p style="margin: 0; font-size: 0.9em; opacity: 0.8;">Evaluate short captions and brief descriptions</p>
 </div>
 </td>
 </tr>
 </table>
 
-<div align="center" style="margin-top: 20px;">
-<table style="border: 2px solid #6366f1; border-radius: 12px; background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); padding: 15px;">
-<tr>
-<td align="center">
-<span style="font-size: 1.1em; font-weight: bold; color: #3730a3;">✨ Ready to revolutionize your narrative analysis?</span>
-</td>
-</tr>
-</table>
-</div>
-
-**Key Innovation:** VCS balances strict versus lenient content alignment, allowing valid descriptive variability while penalizing core narrative distortions, and integrates global and local assessments to detect structural misorderings.
 
 ---
 
 ## 🌟 Key Features
 
-Explore the comprehensive capabilities that make VCS a powerful narrative evaluation toolkit.
+Explore the comprehensive capabilities that make VCS a powerful narrative evaluation toolkit. **To understand these features in detail, read our [research paper](https://arxiv.org/abs/placeholder-link), then visit our [interactive playground](https://hdubey-debug.github.io/vcs/) to see them in action.**
 
 <table width="100%" align="center" style="border: none; border-collapse: collapse;">
   <tr style="background-color: transparent;">
@@ -276,7 +267,7 @@ VCS needs PyTorch but doesn't install it automatically to avoid conflicts. Get i
 <tr>
 <td align="center">
 
-**💡 Note:** VCS automatically installs other dependencies (numpy, matplotlib, seaborn) - you don't need to worry about them!
+**💡 Note:** VCS automatically installs dependencies: numpy≥1.20.0, matplotlib≥3.5.0, seaborn≥0.11.0
 
 </td>
 </tr>
@@ -326,8 +317,9 @@ def your_segmenter(text: str) -> List[str]:
     return list_of_text_segments
 ```
 
-**You can use:** Any library or model (NLTK, spaCy, custom logic, etc.)  
-**Must return:** List of strings where each string is a text segment
+**Arguments:** `text` (str) - Input text to be segmented  
+**Returns:** `List[str]` - List of text segments  
+**You can use:** Any library or model (NLTK, spaCy, custom logic, etc.)
 
 </div>
 
@@ -347,8 +339,9 @@ def your_embedder(texts: List[str]) -> torch.Tensor:
     return tensor_of_embeddings
 ```
 
-**You can use:** Any embedding model (sentence-transformers, OpenAI, etc.)  
-**Must return:** PyTorch tensor of shape `(len(texts), embedding_dim)`
+**Arguments:** `texts` (List[str]) - List of text segments to embed  
+**Returns:** `torch.Tensor` - Tensor of shape `(len(texts), embedding_dim)`  
+**You can use:** Any embedding model (sentence-transformers, OpenAI, etc.)
 
 </div>
 
@@ -455,7 +448,7 @@ Now let's see VCS in action with a complete working example:
 </div>
 
 <details>
-<summary><h3>🚀 <b>Interactive Code Example</b> - Click to expand complete tutorial</h3></summary>
+<summary><h3><b>🚀 Interactive Code Example</b> - Click to expand complete tutorial</h3></summary>
 
 <div style="background: linear-gradient(145deg, #1f2937, #111827); padding: 25px; border-radius: 15px; border: 2px solid #6366f1;">
 
@@ -668,6 +661,65 @@ result = compute_vcs_score(
 </td>
 </tr>
 </table>
+
+<table align="center" width="100%" style="margin-top: 20px;">
+<tr>
+<td width="50%">
+
+### 📊 **Return All Metrics**
+
+<div style="background: linear-gradient(145deg, #fef3c7, #fde68a); padding: 20px; border-radius: 12px; border: 2px solid #f59e0b;">
+
+**🎛️ Control Parameter:**
+
+| Parameter | Default | Purpose |
+|:----------|:-------:|:--------|
+| `return_all_metrics` | False | Return detailed metric breakdown |
+
+**When set to `True`, you get:**
+- Individual GAS, LAS, NAS scores
+- LAS precision and recall components
+- Distance-based and line-based NAS sub-metrics
+- Complete metric breakdown for analysis
+
+</div>
+
+</td>
+<td width="50%">
+
+### 🔍 **Return Internals**
+
+<div style="background: linear-gradient(145deg, #e0f2fe, #b3e5fc); padding: 20px; border-radius: 12px; border: 2px solid #0288d1;">
+
+**🎛️ Control Parameter:**
+
+| Parameter | Default | Purpose |
+|:----------|:-------:|:--------|
+| `return_internals` | False | Return internal computation data |
+
+**When set to `True`, you get:**
+- Similarity matrices and alignment paths
+- Mapping windows and penalty calculations
+- Text chunks and segmentation details
+- All data needed for visualization
+
+</div>
+
+</td>
+</tr>
+</table>
+
+<div align="center">
+<table style="border: 2px solid #3b82f6; border-radius: 12px; background: linear-gradient(145deg, #dbeafe, #bfdbfe); padding: 15px; margin: 20px 0;">
+<tr>
+<td align="center">
+
+**📚 For complete API documentation and visualization guides, visit our [API Documentation](https://hdubey-debug.github.io/vcs/)**
+
+</td>
+</tr>
+</table>
+</div>
 
 ---
 
