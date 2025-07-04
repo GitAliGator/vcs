@@ -309,54 +309,155 @@ print(f"VCS Score: {result['VCS']:.4f}")
 As you can see, VCS requires two custom functions from you. Let's understand what each should do:
 
 
-<table align="center" width="100%">
+<div align="center">
+
+### 🎯 **Interactive Function Guide**
+*Choose your implementation approach*
+
+</div>
+
+<div align="center">
+<table style="border: none; border-collapse: collapse; width: 100%; margin: 20px 0;">
 <tr>
-<td width="50%" align="center">
+<td style="width: 50%; padding: 10px; border: none; vertical-align: top;">
+
+<div style="
+  background: linear-gradient(145deg, #fef3c7, #fde68a);
+  border: 2px solid #f59e0b;
+  border-radius: 15px;
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+">
+
+<div style="
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: rotate(45deg);
+"></div>
+
+<div style="position: relative; z-index: 10;">
 
 ### 🔪 **Segmenter Function**
 
-<div style="background: linear-gradient(145deg, #fef3c7, #fde68a); padding: 20px; border-radius: 12px; border: 2px solid #f59e0b;">
+<div style="background: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin: 15px 0;">
 
-**What it does:** Splits text into meaningful segments (sentences, paragraphs, etc.)
+**🎯 What it does:**  
+Splits text into meaningful segments (sentences, paragraphs, etc.)
 
-**Required signature:**
+</div>
+
+<details style="margin: 15px 0;">
+<summary style="cursor: pointer; font-weight: bold; color: #92400e; font-size: 1.1em;">
+📋 **Function Signature** (Click to expand)
+</summary>
+<div style="background: rgba(0, 0, 0, 0.1); padding: 15px; border-radius: 8px; margin-top: 10px;">
+
 ```python
 def your_segmenter(text: str) -> List[str]:
     # Your implementation here
     return list_of_text_segments
 ```
 
-**Arguments:** `text` (str) - Input text to be segmented  
-**Returns:** `List[str]` - List of text segments  
-**You can use:** Any library or model (NLTK, spaCy, custom logic, etc.)
+</div>
+</details>
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0;">
+<div style="background: rgba(255, 255, 255, 0.4); padding: 8px 12px; border-radius: 20px; font-size: 0.9em;">
+📥 **Input:** `text` (str)
+</div>
+<div style="background: rgba(255, 255, 255, 0.4); padding: 8px 12px; border-radius: 20px; font-size: 0.9em;">
+📤 **Output:** `List[str]`
+</div>
+</div>
+
+<div style="background: rgba(255, 255, 255, 0.3); padding: 12px; border-radius: 8px; font-size: 0.9em;">
+🛠️ **Compatible with:** NLTK, spaCy, custom logic, SAT, etc.
+</div>
+
+</div>
 
 </div>
 
 </td>
-<td width="50%" align="center">
+<td style="width: 50%; padding: 10px; border: none; vertical-align: top;">
+
+<div style="
+  background: linear-gradient(145deg, #f3e8ff, #e9d5ff);
+  border: 2px solid #7c3aed;
+  border-radius: 15px;
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+">
+
+<div style="
+  position: absolute;
+  top: -50px;
+  left: -50px;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: rotate(45deg);
+"></div>
+
+<div style="position: relative; z-index: 10;">
 
 ### 🧠 **Embedding Function**
 
-<div style="background: linear-gradient(145deg, #f3e8ff, #e9d5ff); padding: 20px; border-radius: 12px; border: 2px solid #7c3aed;">
+<div style="background: rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 10px; margin: 15px 0;">
 
-**What it does:** Converts text segments into numerical vectors (embeddings)
+**🎯 What it does:**  
+Converts text segments into numerical vectors (embeddings)
 
-**Required signature:**
+</div>
+
+<details style="margin: 15px 0;">
+<summary style="cursor: pointer; font-weight: bold; color: #5b21b6; font-size: 1.1em;">
+📋 **Function Signature** (Click to expand)
+</summary>
+<div style="background: rgba(0, 0, 0, 0.1); padding: 15px; border-radius: 8px; margin-top: 10px;">
+
 ```python
 def your_embedder(texts: List[str]) -> torch.Tensor:
     # Your implementation here  
     return tensor_of_embeddings
 ```
 
-**Arguments:** `texts` (List[str]) - List of text segments to embed  
-**Returns:** `torch.Tensor` - Tensor of shape `(len(texts), embedding_dim)`  
-**You can use:** Any embedding model (sentence-transformers, OpenAI, etc.)
+</div>
+</details>
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0;">
+<div style="background: rgba(255, 255, 255, 0.4); padding: 8px 12px; border-radius: 20px; font-size: 0.9em;">
+📥 **Input:** `List[str]`
+</div>
+<div style="background: rgba(255, 255, 255, 0.4); padding: 8px 12px; border-radius: 20px; font-size: 0.9em;">
+📤 **Output:** `torch.Tensor`
+</div>
+</div>
+
+<div style="background: rgba(255, 255, 255, 0.3); padding: 12px; border-radius: 8px; font-size: 0.9em;">
+🛠️ **Compatible with:** sentence-transformers, OpenAI, nv-embed-v2, etc.
+</div>
+
+</div>
 
 </div>
 
 </td>
 </tr>
 </table>
+</div>
 
 #### 🌟 Author Recommendations (2025)
 
