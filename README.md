@@ -611,7 +611,7 @@ Once you're comfortable with the basics, you can fine-tune VCS behavior for your
 
 <table align="center" width="100%">
 <tr>
-<td width="50%">
+<td width="33%" align="center">
 
 ### 🎯 **Core Parameters**
 
@@ -629,42 +629,7 @@ Once you're comfortable with the basics, you can fine-tune VCS behavior for your
 </div>
 
 </td>
-<td width="50%">
-
-### 🚀 **Example Configuration**
-
-<div style="background: linear-gradient(145deg, #ecfdf5, #d1fae5); padding: 20px; border-radius: 12px; border: 2px solid #059669;">
-
-```python
-from vcs import (
-    DEFAULT_CONTEXT_CUTOFF_VALUE,    # 0.6
-    DEFAULT_CONTEXT_WINDOW_CONTROL,  # 4.0
-    DEFAULT_LCT,                     # 0
-    DEFAULT_CHUNK_SIZE,              # 1
-)
-
-# 🎯 For strict matching
-result = compute_vcs_score(
-    reference_text=ref_text,
-    generated_text=gen_text,
-    segmenter_fn=segmenter,
-    embedding_fn_las=embedder,
-    chunk_size=2,                    # Group segments
-    context_cutoff_value=0.7,        # Higher threshold
-    context_window_control=3.0,      # Tighter windows
-    lct=1,                          # Some reordering OK
-)
-```
-
-</div>
-
-</td>
-</tr>
-</table>
-
-<table align="center" width="100%" style="margin-top: 20px;">
-<tr>
-<td width="50%">
+<td width="33%" align="center">
 
 ### 📊 **Return All Metrics**
 
@@ -685,7 +650,7 @@ result = compute_vcs_score(
 </div>
 
 </td>
-<td width="50%">
+<td width="33%" align="center">
 
 ### 🔍 **Return Internals**
 
@@ -702,6 +667,44 @@ result = compute_vcs_score(
 - Mapping windows and penalty calculations
 - Text chunks and segmentation details
 - All data needed for visualization
+
+</div>
+
+</td>
+</tr>
+</table>
+
+<table align="center" width="100%" style="margin-top: 20px;">
+<tr>
+<td align="center">
+
+### 🚀 **Example Configuration**
+
+<div style="background: linear-gradient(145deg, #ecfdf5, #d1fae5); padding: 20px; border-radius: 12px; border: 2px solid #059669;">
+
+```python
+from vcs import (
+    DEFAULT_CONTEXT_CUTOFF_VALUE,    # 0.6
+    DEFAULT_CONTEXT_WINDOW_CONTROL,  # 4.0
+    DEFAULT_LCT,                     # 0
+    DEFAULT_CHUNK_SIZE,              # 1
+)
+
+# 🎯 Comprehensive configuration with all features enabled
+result = compute_vcs_score(
+    reference_text=ref_text,
+    generated_text=gen_text,
+    segmenter_fn=segmenter,
+    embedding_fn_las=embedder,
+    embedding_fn_gas=embedder,
+    chunk_size=2,                    # Group segments
+    context_cutoff_value=0.7,        # Higher threshold
+    context_window_control=3.0,      # Tighter windows
+    lct=1,                          # Some reordering OK
+    return_all_metrics=True,         # Get detailed breakdown
+    return_internals=True           # Get visualization data
+)
+```
 
 </div>
 
