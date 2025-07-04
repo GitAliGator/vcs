@@ -685,11 +685,11 @@ Once you're comfortable with the basics, you can fine-tune VCS behavior for your
 
 <table align="center" width="100%" style="margin-top: 20px;">
 <tr>
-<td align="center">
-
-### 🚀 **Example Configuration**
-
-<div style="background: linear-gradient(145deg, #ecfdf5, #d1fae5); padding: 20px; border-radius: 12px; border: 2px solid #059669;">
+<td width="100%">
+<div align="center">
+<h3>🚀 **Example Configuration**</h3>
+</div>
+<div style="background: linear-gradient(145deg, #ecfdf5, #d1fae5); padding: 20px; border-radius: 12px; border: 2px solid #059669; text-align: left;">
 
 ```python
 # 🎯 Comprehensive configuration with all features enabled
@@ -699,12 +699,12 @@ result = compute_vcs_score(
     segmenter_fn=segmenter,
     embedding_fn_las=embedder,
     embedding_fn_gas=embedder,
-    chunk_size=2,                    # Group segments
-    context_cutoff_value=0.7,        # Higher threshold
-    context_window_control=3.0,      # Tighter windows
-    lct=1,                          # Some reordering OK
-    return_all_metrics=True,         # Get detailed breakdown
-    return_internals=True           # Get visualization data
+    chunk_size=2,                  # Group segments
+    context_cutoff_value=0.7,      # Higher threshold
+    context_window_control=3.0,    # Tighter windows
+    lct=1,                         # Some reordering OK
+    return_all_metrics=True,       # Get detailed breakdown
+    return_internals=True          # Get visualization data
 )
 ```
 
